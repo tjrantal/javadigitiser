@@ -1,0 +1,37 @@
+apply plugin: 'java'
+
+repositories {
+       mavenCentral()
+}
+
+configurations {
+    // configuration that holds jars to include in the jar
+    extraLibs
+}
+
+dependencies {
+	compile group: 'org.jcodec', name: 'jcodec', version: '0.2.3'	
+	extraLibs group: 'org.jcodec', name: 'jcodec', version: '0.2.3'
+
+	compile group: 'org.jcodec', name: 'jcodec-javase', version: '0.2.3'
+	extraLibs group: 'org.jcodec', name: 'jcodec-javase', version: '0.2.3'
+	
+	
+	configurations.compile.extendsFrom(configurations.extraLibs)
+}
+
+
+
+sourceCompatibility = 1.6
+version = '1.0'
+jar {
+	manifest {
+	  attributes	'Implementation-Title': 'Digitiser',
+	         		'Implementation-Version': version,
+						'Main-Class': 'timo.home.Digitiser'
+	}
+	from {
+		configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
+	}
+}
+
