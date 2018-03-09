@@ -39,41 +39,19 @@ public class VideoReader{
 		this.fileIn = fileIn;
 		try{
 			
-			//Get duration, and number of frames
 			File tempFile = new File(fileIn);
 			//Format f = JCodecUtil.detectFormat(tempFile);
 			Demuxer d = JCodecUtil.createDemuxer(JCodecUtil.detectFormat(tempFile), tempFile);
+			//Get info from the track; duration, number of frames, size
 			DemuxerTrack video_track = d.getVideoTracks().get(0);
-			
-			
-			/*
-				Picture size
-				import org.jcodec.common.model.Size;
-				import org.jcodec.common.VideoCodecMeta;
-				Size pictureSize = vcMeta.getSize();
-				
-				Format format = JCodecUtil.detectFormat(tempFile);
-        		Codec videoCodec = getVideoCodec(format, tempFile);
-        		CodecMeta = videoCodec.getMeta();
-        		
-        		DemuxerTrack.getMeta()
-        		getVideoCodecMeta()
-			*/
-			//MP4Demuxer demuxer = new MP4Demuxer(ch); 
-			//DemuxerTrack video_track = demuxer.getVideoTrack(); 
 			duration = video_track.getMeta().getTotalDuration();
 			frames = video_track.getMeta().getTotalFrames();
 			fps = ((double) frames)/duration;
 			Size pictureSize = video_track.getMeta().getVideoCodecMeta().getSize();
 			width = pictureSize.getWidth();
 	 		height = pictureSize.getHeight();
-			
 			ch = NIOUtils.readableChannel(new File(fileIn));
 			fg = FrameGrab.createFrameGrab(ch);
-			//fg = new FrameGrab(video_track, detectDecoder(video_track));
-        	//fg.decodeLeadingFrames();
-			
-		   //fg = FrameGrab.createFrameGrab(ch);
       }catch(Exception e){
 			System.out.println(e.toString());
 		}
@@ -111,7 +89,7 @@ public class VideoReader{
 		return height; //widthbi.getHeight();
 	}
 	
-	public BufferedImage readFrame(int frameNumber){
+	public BIWithMeta readFrame(int frameNumber){
 		try{
 			fg = fg.seekToFramePrecise(frameNumber);
 			return nextFrame();
@@ -121,10 +99,10 @@ public class VideoReader{
 		}
 	}
 	
-	public BufferedImage nextFrame() throws Exception{
+	public BIWithMeta nextFrame() throws Exception{
 		try{
 			PictureWithMetadata picture = fg.getNativeFrameWithMetadata();
-			return AWTUtil.toBufferedImage(picture.getPicture);
+			return new BIWithMeta(AWTUtil.toBufferedImage(picture.getPicture()),picture.getTimestamp(),picture.getDuration());
 		}catch(Exception e){
 			System.out.println(e.toString());
 			return null;
