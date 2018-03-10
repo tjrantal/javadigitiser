@@ -7,70 +7,44 @@
 <?import javafx.scene.text.*?>
 <?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 
 <!--Add layout alignment="center"-->
 <GridPane fx:controller="timo.home.fxml.FXMLControls" xmlns:fx="http://javafx.com/fxml"
 			hgap="5" vgap="5" maxHeight="Infinity" maxWidth="Infinity">
 	<padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
 	 <!--rotate="-90"-->
-	 <Label fx:id="aLabel" text="Launch Angle 20.0"  GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="0" GridPane.rowSpan="1" GridPane.vgrow="always"/>
+	 <Label fx:id="frameLabel" text="Frame No "  GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="0" GridPane.rowSpan="1" GridPane.vgrow="always"/>
 	<Slider
-		fx:id="aSlider" value="20" min="10" max="90" orientation="HORIZONTAL" GridPane.vgrow="always"
+		fx:id="frameSlider" value="0" min="0" max="90" orientation="HORIZONTAL" GridPane.vgrow="always"
 			showTickLabels="TRUE" showTickMarks="TRUE" blockIncrement="5" majorTickUnit="20" minorTickCount="1"
 		 GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="1" GridPane.rowSpan="1">
 	</Slider>
 
-	 <Label fx:id="vLabel" text="Launch Velocity 25.0"  GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="2" GridPane.rowSpan="1" GridPane.vgrow="always"/>
-	<Slider
-		fx:id="vSlider" value="25" min="15" max="30" orientation="HORIZONTAL" GridPane.vgrow="always"
-		showTickLabels="TRUE" showTickMarks="TRUE" blockIncrement="2" majorTickUnit="5" minorTickCount="1"
-		 GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="1">
-	</Slider>
+	 
 
-	 <Label fx:id="sLabel" text="Spin RPS 0.00"  GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="4" GridPane.rowSpan="1" GridPane.vgrow="always"/>
-	<Slider
-		fx:id="sSlider" value="0" min="0" max="8" orientation="HORIZONTAL" GridPane.vgrow="always"
-		showTickLabels="TRUE" showTickMarks="TRUE" blockIncrement="1" majorTickUnit="2" minorTickCount="1"
-		 GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="5" GridPane.rowSpan="1">
-	</Slider>
-	
-	<Label fx:id="rLabel" text="Spin Angle 0.00"  GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="6" GridPane.rowSpan="1" GridPane.vgrow="always"/>
-	<Slider
-		fx:id="rSlider" value="0" min="-90" max="90" orientation="HORIZONTAL" GridPane.vgrow="always"
-		showTickLabels="TRUE" showTickMarks="TRUE" blockIncrement="10" majorTickUnit="20" minorTickCount="10"
-		 GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="7" GridPane.rowSpan="1">
-	</Slider>
-
-	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="8" GridPane.vgrow="always"
-		text="Simulate" onAction="#handleSubmitButtonAction">
+	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="2" GridPane.vgrow="always"
+		text="Load Video" onAction="#handleLoadButtonAction">
 	</Button>
-	<Text fx:id="actiontarget"
-			 GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="9"
-			 GridPane.vgrow="always"
-			 />
-
+	
+	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.vgrow="always"
+		text="Next Frame" onAction="#handleFrameButtonAction">
+	</Button>
+	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="4" GridPane.vgrow="always"
+		text="Close Video" onAction="#handleCloseButtonAction">
+	</Button>
 	
 			 
-	<!--graph-->
-	<LineChart
-		fx:id="lineChart" GridPane.columnIndex="3" GridPane.rowIndex="4" GridPane.rowSpan="6"
-		GridPane.hgrow="always" GridPane.vgrow="always">
-		<xAxis>
-		 <NumberAxis fx:id="xAxis" side="BOTTOM" />
-		</xAxis>
-		<yAxis>
-		 <NumberAxis fx:id="yAxis" side="LEFT" />
-		</yAxis>
-	</LineChart>
-	<LineChart
-		fx:id="zLineChart" GridPane.columnIndex="3" GridPane.rowIndex="0" GridPane.rowSpan="4"
-		GridPane.hgrow="always" GridPane.vgrow="always">
-		<xAxis>
-		 <NumberAxis fx:id="zxAxis" side="BOTTOM" />
-		</xAxis>
-		<yAxis>
-		 <NumberAxis fx:id="zyAxis" side="LEFT" />
-		</yAxis>
-	</LineChart>
+	<!--VideoView-->
+	<ImageView
+			GridPane.columnIndex="3" GridPane.columnSpan="6" GridPane.rowIndex="0" GridPane.rowSpan="5"
+		    fx:id="videoView"
+		    fitWidth="600.0"
+		    fitHeight="450.0"
+		    pickOnBounds="true"
+		    preserveRatio="true"
+		>
+	</ImageView>
+	
 </GridPane>
 
