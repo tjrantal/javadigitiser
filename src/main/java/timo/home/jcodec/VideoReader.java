@@ -26,7 +26,7 @@ import org.jcodec.api.PictureWithMetadata;
 
 public class VideoReader{
 	BufferedImage bi;
-	String fileIn;
+
 	FrameGrab fg = null;
 	FileChannelWrapper ch = null;
 	double duration;
@@ -36,10 +36,12 @@ public class VideoReader{
 	int height;
 
 	public VideoReader(String fileIn){
-		this.fileIn = fileIn;
+		this(new File(fileIn));
+	}
+
+	public VideoReader(File tempFile){
 		try{
 			
-			File tempFile = new File(fileIn);
 			//Format f = JCodecUtil.detectFormat(tempFile);
 			Demuxer d = JCodecUtil.createDemuxer(JCodecUtil.detectFormat(tempFile), tempFile);
 			//Get info from the track; duration, number of frames, size
@@ -50,7 +52,7 @@ public class VideoReader{
 			Size pictureSize = video_track.getMeta().getVideoCodecMeta().getSize();
 			width = pictureSize.getWidth();
 	 		height = pictureSize.getHeight();
-			ch = NIOUtils.readableChannel(new File(fileIn));
+			ch = NIOUtils.readableChannel(tempFile);
 			fg = FrameGrab.createFrameGrab(ch);
       }catch(Exception e){
 			System.out.println(e.toString());

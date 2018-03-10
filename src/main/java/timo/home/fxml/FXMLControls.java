@@ -12,6 +12,11 @@ import javafx.scene.image.*;	//ImageView
 import javafx.embed.swing.SwingFXUtils;	//BufferedImage to javaFX Image
 import javafx.scene.input.MouseEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
+import javafx.stage.FileChooser;	//Picking a video file to read
+import javafx.stage.FileChooser.ExtensionFilter;	//Picking a video file to read
+import java.util.Arrays;
+import java.io.File;
 
 import timo.home.jcodec.VideoReader;
 import timo.home.jcodec.BIWithMeta;
@@ -33,56 +38,12 @@ public class FXMLControls{
 	
 	//For UI
 	public int currentFrameNo = 0;
+	//public Node thisNode;
     
     //Initialise gets called when the controller is instantiated
     public void initialize(){
-    	System.out.println("INITIALISE");
-		videoReader = new VideoReader("VID-20180304-WA0000.mp4");
-		double duration = videoReader.getDuration();
-		int	frames = videoReader.getTotalFrames();
-		double fps = videoReader.getFPS();
-		int width = videoReader.getWidth();
-		int height = videoReader.getHeight();
-		System.out.println(String.format("Duration %.1f frames %d fps %.2f width %d height %d",duration,frames,fps,width,height));	
-		
-		//Prep the slider
-		frameSlider.setMin(0);
-		frameSlider.setMax(frames-1);
-		frameSlider.setBlockIncrement(1d);
-		
-		//Attach Slider listener for clicking on the slider 
-		
-		frameSlider.valueProperty().addListener(new ChangeListener<Number>() {
-			public void changed(ObservableValue<? extends Number> ov,
-				 Number old_val, Number new_val) {
-				 		//Update text label while dragging
-				 		int val = new_val.intValue();
-				 		frameLabel.setText(String.format("Frame No %d", val));
-				     
-				     //Only update the frame if the slider is no longer moving
-				     if (!frameSlider.isValueChanging() & currentFrameNo !=val){
-				     		System.out.println(String.format("Start searching frame %d",val));
-						  	getFrame(val);
-					  }
-				}
-		});
-		
-		
-		//Try firing end of drag event manually
-		frameSlider.setOnMouseReleased(new EventHandler<MouseEvent>() {
-				@Override
-				public void handle(MouseEvent e) {
-                Slider source = (Slider)e.getSource();
-			 		int val = (int) source.getValue();
-			 		frameLabel.setText(String.format("Frame No %d", val));
-			 		if (currentFrameNo != val){
-			 			System.out.println(String.format("MOUSE Start searching frame %d current %d",val,currentFrameNo));
-				 		getFrame(val);
-			     }
-            }
-		
-			
-		});	
+    	//System.out.println("INITIALISE");
+
     }
     
 
@@ -90,7 +51,64 @@ public class FXMLControls{
     @FXML protected void handleLoadButtonAction(ActionEvent event) {
         //Test reading, and displaying a frame here
         System.out.println("Got LoadButton click");
-        BIWithMeta currentFrame = null;
+        
+        //Browse for a file
+        FileChooser fc = new FileChooser();
+		 fc.setTitle("Select MP4 videofile");
+		 fc.getExtensionFilters().addAll(
+				   new ExtensionFilter("Video files", Arrays.asList(new String[]{"*.mp4","*.MP4"})));
+		 File selectedFile = fc.showOpenDialog(frameLabel.getScene().getWindow());
+		 if (selectedFile != null) {
+			 System.out.println("Got File "+selectedFile.toString());
+			 videoReader = new VideoReader(selectedFile);
+			double duration = videoReader.getDuration();
+			int	frames = videoReader.getTotalFrames();
+			double fps = videoReader.getFPS();
+			int width = videoReader.getWidth();
+			int height = videoReader.getHeight();
+			System.out.println(String.format("Duration %.1f frames %d fps %.2f width %d height %d",duration,frames,fps,width,height));	
+		
+			//Prep the slider
+			frameSlider.setMin(0);
+			frameSlider.setMax(frames-1);
+			frameSlider.setBlockIncrement(1d);
+		
+			//Attach Slider listener for clicking on the slider 
+		
+			frameSlider.valueProperty().addListener(new ChangeListener<Number>() {
+				public void changed(ObservableValue<? extends Number> ov,
+					 Number old_val, Number new_val) {
+					 		//Update text label while dragging
+					 		int val = new_val.intValue();
+					 		frameLabel.setText(String.format("Frame No %d", val));
+						  
+						  //Only update the frame if the slider is no longer moving
+						  if (!frameSlider.isValueChanging() & currentFrameNo !=val){
+						  		System.out.println(String.format("Start searching frame %d",val));
+							  	getFrame(val);
+						  }
+					}
+			});
+		
+		
+			//Try firing end of drag event manually
+			frameSlider.setOnMouseReleased(new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent e) {
+		             Slider source = (Slider)e.getSource();
+				 		int val = (int) source.getValue();
+				 		frameLabel.setText(String.format("Frame No %d", val));
+				 		if (currentFrameNo != val){
+				 			System.out.println(String.format("MOUSE Start searching frame %d current %d",val,currentFrameNo));
+					 		getFrame(val);
+					  }
+		         }
+		
+			
+			});	
+			 
+			 //Display the first image
+			 BIWithMeta currentFrame = null;
         try{
         		long beforeMillis = System.currentTimeMillis();
 				currentFrame = videoReader.nextFrame();
@@ -99,7 +117,11 @@ public class FXMLControls{
         }catch (Exception ex){
             System.err.println("Could not read frame.");
         }
-        videoView.setImage(SwingFXUtils.toFXImage(currentFrame, null));        
+        videoView.setImage(SwingFXUtils.toFXImage(currentFrame, null));
+			 
+		 }
+        
+                
     }
     
      @FXML protected void handleFrameButtonAction(ActionEvent event) {
