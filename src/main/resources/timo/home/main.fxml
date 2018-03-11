@@ -21,23 +21,36 @@
 		 GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="1" GridPane.rowSpan="1">
 	</Slider>
 
-	 
+	<Button fx:id="trackButton" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.vgrow="always"
+		text="Auto Track Off" onAction="#handleTrackButtonAction">
+	</Button>
+	
+	<Label fx:id="colourLabel" text="Colour tolerance 10"  GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="4" GridPane.rowSpan="1" GridPane.vgrow="always"/>
+	<Slider
+		fx:id="colourSlider" value="10" min="0" max="40" orientation="HORIZONTAL" GridPane.vgrow="always"
+			showTickLabels="TRUE" showTickMarks="TRUE" blockIncrement="5" majorTickUnit="20" minorTickCount="1"
+		 GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="5" GridPane.rowSpan="1">
+	</Slider>	 
 
-	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="2" GridPane.vgrow="always"
+	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="6" GridPane.vgrow="always"
 		text="Load Video" onAction="#handleLoadButtonAction">
 	</Button>
 	
-	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.vgrow="always"
+	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="7" GridPane.vgrow="always"
 		text="Next Frame" onAction="#handleFrameButtonAction">
 	</Button>
-	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="4" GridPane.vgrow="always"
+	
+	
+	
+	
+	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="6" GridPane.vgrow="always"
 		text="Close Video" onAction="#handleCloseButtonAction">
 	</Button>
 	
 			 
 	<!--VideoView-->
 	<ImageView
-			GridPane.columnIndex="3" GridPane.columnSpan="6" GridPane.rowIndex="0" GridPane.rowSpan="5"
+			GridPane.columnIndex="3" GridPane.columnSpan="6" GridPane.rowIndex="0" GridPane.rowSpan="10"
 		    fx:id="videoView"
 		    fitWidth="600.0"
 		    fitHeight="450.0"

@@ -32,12 +32,16 @@ public class FXMLControls{
 	//VideoView
 	@FXML ImageView videoView;
 	
+	//Track Button
+	@FXML Button trackButton;
+	
 	//JCodec videoreader
 	private VideoReader videoReader;
 	private BIWithMeta currentFrame;
 	
 	//For UI
 	public int currentFrameNo = 0;
+	public boolean trackOn = false;
 	//public Node thisNode;
     
     //Initialise gets called when the controller is instantiated
@@ -113,7 +117,7 @@ public class FXMLControls{
         		long beforeMillis = System.currentTimeMillis();
 				currentFrame = videoReader.nextFrame();
 				long afterMillis = System.currentTimeMillis();
-				System.out.println(String.format("got frame %.2f",((double) (afterMillis-beforeMillis))/1000d));
+				System.out.println(String.format("got frame, time stamp %.2f took %.2f s to decpde",currentFrame.getTimeStamp(),((double) (afterMillis-beforeMillis))/1000d));
         }catch (Exception ex){
             System.err.println("Could not read frame.");
         }
@@ -130,6 +134,13 @@ public class FXMLControls{
         frameSlider.increment();
      }
     
+     @FXML protected void handleTrackButtonAction(ActionEvent event) {
+        //Test reading, and displaying a frame here
+        trackOn ^= true;
+        System.out.println(String.format("Auto Track %s",trackOn ? "On" : "Off"));
+        trackButton.setText(String.format("Auto Track %s",trackOn ? "On" : "Off"));
+     }
+    
    	@FXML protected void handleCloseButtonAction(ActionEvent event) {
 		  System.out.println("Got Close button click");
 		  videoReader.close();
@@ -143,9 +154,8 @@ public class FXMLControls{
         		long beforeMillis = System.currentTimeMillis();
 				currentFrame = videoReader.nextFrame();
 				long afterMillis = System.currentTimeMillis();
-				System.out.println(String.format("FrameButton  got frame %.2f",((double) (afterMillis-beforeMillis))/1000d));
-				
-				
+				System.out.println(String.format("got next frame, time stamp %.2f took %.2f s to decpde",currentFrame.getTimeStamp(),((double) (afterMillis-beforeMillis))/1000d));
+								
         }catch (Exception ex){
             System.err.println("Could not read frame.");
         }
@@ -174,7 +184,7 @@ public class FXMLControls{
 					currentFrame = videoReader.readFrame(frameNo);
 				
 					long afterMillis = System.currentTimeMillis();
-					System.out.println(String.format("got frame %.2f",((double) (afterMillis-beforeMillis))/1000d));
+					System.out.println(String.format("got frame, time stamp %.2f took %.2f s to decpde",currentFrame.getTimeStamp(),((double) (afterMillis-beforeMillis))/1000d));
 			  }catch (Exception ex){
 					System.err.println("Could not read frame.");
 			  }
