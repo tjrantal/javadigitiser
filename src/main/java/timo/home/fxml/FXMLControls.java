@@ -46,7 +46,7 @@ public class FXMLControls{
 	public int currentFrameNo = 0;
 	public boolean trackOn = false;
 	public int colourTolerance = 10;
-	//public Node thisNode;
+	public double[] digitisedCoordinates = new double[2];
     
     //Initialise gets called when the controller is instantiated
     public void initialize(){
@@ -133,7 +133,19 @@ public class FXMLControls{
             System.err.println("Could not read frame.");
         }
         videoView.setImage(SwingFXUtils.toFXImage(currentFrame, null));
-			 
+		
+			//Attach mouse released listener on the videoView to digitise markers
+			videoView.setOnMouseReleased(new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent e) {
+						digitisedCoordinates[0] = e.getX();
+						digitisedCoordinates[1] = e.getX();
+						System.out.println(String.format("Digitised X %.1f Y %.1f",digitisedCoordinates[0],digitisedCoordinates[1]));
+		         }
+		
+			
+			});
+		 
 		 }
         
                 
