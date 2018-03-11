@@ -140,9 +140,9 @@ public class FXMLControls{
 					public void handle(MouseEvent e) {
 						digitisedCoordinates[0] = e.getX();
 						digitisedCoordinates[1] = e.getY();
-						System.out.println(String.format("Digitised X %.1f Y %.1f xscale %.2f yscale %.2f",digitisedCoordinates[0],digitisedCoordinates[1]
-						,((double) videoView.getFitWidth())/((double) currentFrame.getWidth())
-						,((double) videoView.getFitHeight())/((double) currentFrame.getHeight()) ));
+						System.out.println(String.format("Digitised X %.1f Y %.1f fitWidth %d fitHeight %d frameW %d frameHeight %d",digitisedCoordinates[0],digitisedCoordinates[1]
+						,videoView.getFitWidth(), videoView.getFitHeight(),
+						currentFrame.getWidth(), currentFrame.getHeight()));
 		         }
 		
 			
