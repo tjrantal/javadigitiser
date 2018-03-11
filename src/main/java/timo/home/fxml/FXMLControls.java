@@ -29,6 +29,9 @@ public class FXMLControls{
 	@FXML Slider frameSlider;
 	@FXML Label frameLabel;
 	
+	@FXML Slider colourSlider;
+	@FXML Label colourLabel;
+	
 	//VideoView
 	@FXML ImageView videoView;
 	
@@ -42,12 +45,20 @@ public class FXMLControls{
 	//For UI
 	public int currentFrameNo = 0;
 	public boolean trackOn = false;
+	public int colourTolerance = 10;
 	//public Node thisNode;
     
     //Initialise gets called when the controller is instantiated
     public void initialize(){
-    	//System.out.println("INITIALISE");
-
+		//Attach Slider listener for colour slider 
+		colourSlider.valueProperty().addListener(new ChangeListener<Number>() {
+			public void changed(ObservableValue<? extends Number> ov,
+				 Number old_val, Number new_val) {
+				 		//Update tolerance in real time
+				 		colourTolerance = new_val.intValue();
+				 		colourLabel.setText(String.format("Colour tolerance %02d", colourTolerance));
+				}
+		});
     }
     
 

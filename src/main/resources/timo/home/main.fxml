@@ -17,7 +17,7 @@
 	 <Label fx:id="frameLabel" text="Frame No "  GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="0" GridPane.rowSpan="1" GridPane.vgrow="always"/>
 	<Slider
 		fx:id="frameSlider" value="0" min="0" max="90" orientation="HORIZONTAL" GridPane.vgrow="always"
-			showTickLabels="TRUE" showTickMarks="TRUE" blockIncrement="5" majorTickUnit="20" minorTickCount="1"
+			showTickLabels="TRUE" showTickMarks="TRUE" blockIncrement="1" majorTickUnit="20" minorTickCount="1"
 		 GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="1" GridPane.rowSpan="1">
 	</Slider>
 
@@ -27,8 +27,8 @@
 	
 	<Label fx:id="colourLabel" text="Colour tolerance 10"  GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="4" GridPane.rowSpan="1" GridPane.vgrow="always"/>
 	<Slider
-		fx:id="colourSlider" value="10" min="0" max="40" orientation="HORIZONTAL" GridPane.vgrow="always"
-			showTickLabels="TRUE" showTickMarks="TRUE" blockIncrement="5" majorTickUnit="20" minorTickCount="1"
+		fx:id="colourSlider" value="10" min="0" max="50" orientation="HORIZONTAL" GridPane.vgrow="always"
+			showTickLabels="TRUE" showTickMarks="TRUE" blockIncrement="1" majorTickUnit="10" minorTickCount="1"
 		 GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="5" GridPane.rowSpan="1">
 	</Slider>	 
 
