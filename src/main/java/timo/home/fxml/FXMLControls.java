@@ -17,6 +17,7 @@ import javafx.stage.FileChooser;	//Picking a video file to read
 import javafx.stage.FileChooser.ExtensionFilter;	//Picking a video file to read
 import java.util.Arrays;
 import java.io.File;
+import javafx.geometry.Bounds;
 
 import timo.home.jcodec.VideoReader;
 import timo.home.jcodec.BIWithMeta;
@@ -138,11 +139,32 @@ public class FXMLControls{
 			videoView.setOnMouseReleased(new EventHandler<MouseEvent>() {
 					@Override
 					public void handle(MouseEvent e) {
-						digitisedCoordinates[0] = e.getX();
-						digitisedCoordinates[1] = e.getY();
-						System.out.println(String.format("Digitised X %.1f Y %.1f fitWidth %d fitHeight %d frameW %d frameHeight %d",digitisedCoordinates[0],digitisedCoordinates[1]
+						//Scale into frame pixels from view pixels
+						Bounds bounds = videoView.getBoundsInParent();
+						double xScale = bounds.getWidth()/((double) currentFrame.getWidth());
+						double yScale = bounds.getHeight()/((double) currentFrame.getHeight());
+					
+						digitisedCoordinates[0] = e.getX()/xScale;
+						digitisedCoordinates[1] = e.getY()/yScale;
+						
+						System.out.println(String.format("Digitised X %.1f Y %.1f scaledX %.1f scaledY %.1f"
+						,e.getX(),e.getY()
+						,digitisedCoordinates[0],digitisedCoordinates[1])
+						);
+						
+						/*
+						
+						System.out.println(String.format("Digitised X %.1f Y %.1f fitWidth %.1f fitHeight %.1f frameW %d frameHeight %d",digitisedCoordinates[0],digitisedCoordinates[1]
+						,bounds.getWidth(), bounds.getHeight(),
+						currentFrame.getWidth(), currentFrame.getHeight()));
+						
+						*/
+						
+						/*
+						System.out.println(String.format("Digitised X %.1f Y %.1f fitWidth %.1f fitHeight %.1f frameW %d frameHeight %d",digitisedCoordinates[0],digitisedCoordinates[1]
 						,videoView.getFitWidth(), videoView.getFitHeight(),
 						currentFrame.getWidth(), currentFrame.getHeight()));
+						*/
 		         }
 		
 			
