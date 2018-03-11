@@ -39,7 +39,7 @@ public class FXMLControls{
 	@FXML Button trackButton;
 	
 	//JCodec videoreader
-	private VideoReader videoReader;
+	private VideoReader videoReader = null;
 	private BIWithMeta currentFrame;
 	
 	//For UI
@@ -123,7 +123,7 @@ public class FXMLControls{
 			});	
 			 
 			 //Display the first image
-			 BIWithMeta currentFrame = null;
+			 currentFrame = null;
         try{
         		long beforeMillis = System.currentTimeMillis();
 				currentFrame = videoReader.nextFrame();
@@ -139,8 +139,10 @@ public class FXMLControls{
 					@Override
 					public void handle(MouseEvent e) {
 						digitisedCoordinates[0] = e.getX();
-						digitisedCoordinates[1] = e.getX();
-						System.out.println(String.format("Digitised X %.1f Y %.1f",digitisedCoordinates[0],digitisedCoordinates[1]));
+						digitisedCoordinates[1] = e.getY();
+						System.out.println(String.format("Digitised X %.1f Y %.1f xscale %.2f yscale %.2f",digitisedCoordinates[0],digitisedCoordinates[1]
+						,((double) videoView.getFitWidth())/((double) currentFrame.getWidth())
+						,((double) videoView.getFitHeight())/((double) currentFrame.getHeight()) ));
 		         }
 		
 			
@@ -164,14 +166,28 @@ public class FXMLControls{
         trackButton.setText(String.format("Auto Track %s",trackOn ? "On" : "Off"));
      }
     
-   	@FXML protected void handleCloseButtonAction(ActionEvent event) {
+     @FXML protected void handleCloseButtonAction(ActionEvent event) {
 		  System.out.println("Got Close button click");
-		  videoReader.close();
+		  
+		  closeVideo();
+	  }
+	  
+	  public void closeVideo(){
+	  		if (videoReader != null){
+	  			videoReader.close();
+	  		}
+	  		videoReader = null;		
+	  }
+	 
+	 //Cleanup here
+	 public void shutdown(){
+	 	System.out.println("Called controls shutdown()");
+	 	closeVideo();
 	 }
 	 
 	 //Helper functions
 	 public void getNextFrame(){
-	 	BIWithMeta currentFrame = null;
+	 	currentFrame = null;
 			//Get next frame here
         try{
         		long beforeMillis = System.currentTimeMillis();
@@ -201,7 +217,7 @@ public class FXMLControls{
 	 		currentFrameNo = frameNo;
 	 		frameSlider.setValue(currentFrameNo);
 			  //Update the VideoView
-			  BIWithMeta currentFrame = null;
+			  currentFrame = null;
 			  try{
 			  		long beforeMillis = System.currentTimeMillis();
 					currentFrame = videoReader.readFrame(frameNo);

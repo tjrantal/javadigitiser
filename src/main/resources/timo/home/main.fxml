@@ -43,7 +43,7 @@
 	
 	
 	
-	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="6" GridPane.vgrow="always"
+	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="8" GridPane.vgrow="always"
 		text="Close Video" onAction="#handleCloseButtonAction">
 	</Button>
 	
