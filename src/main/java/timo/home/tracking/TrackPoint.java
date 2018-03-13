@@ -4,12 +4,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Collections;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
+
 import timo.home.jcodec.BIWithMeta;
 
 
 public class TrackPoint{
 	private BIWithMeta currentFrame;
-	private BIWithMeta colouredFrame;
+	private BufferedImage colouredFrame;
 	private int colourTolerance;
 	private double[] digitisedCoordinates; // = new double[2];
 	private int searchRadius = 20;
@@ -24,10 +28,32 @@ public class TrackPoint{
 		width = currentFrame.getWidth();
 		height = currentFrame.getHeight();
 		neighbourhood = getNeighbourhood(searchRadius);
+		colouredFrame = deepCopy(currentFrame);
+		//Look for the point within the neighbourhood, and colour the colouredFrame
 	}
 	
-	public BIWithMeta getColoured(){
+	
+	private BufferedImage deepCopy(BufferedImage bi) {
+	 ColorModel cm = bi.getColorModel();
+	 boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+	 WritableRaster raster = bi.copyData(null);
+	 return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+	}
+	
+	public BufferedImage getColoured(){
 		return colouredFrame;
+	}
+	
+	/**Flood fill implemented as recursive functions (i.e floodFill calls floodFill)
+		Took the idea from https://github.com/pedrovgs/Algorithms/blob/master/src/main/java/com/github/pedrovgs/problem42/FloodFill.java
+	*/
+	
+	private void floodFill(int x, int y, int r, int g, int b, int tol){
+		
+	}
+	
+	private int getValue(){
+		return 0;
 	}
 
 	/**Get pixel neighbourhood coordinates in a concentric circle
