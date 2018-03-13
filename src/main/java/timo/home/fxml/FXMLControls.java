@@ -21,7 +21,7 @@ import javafx.geometry.Bounds;
 
 import timo.home.jcodec.VideoReader;
 import timo.home.jcodec.BIWithMeta;
-
+import timo.home.tracking.TrackPoint;
 
 public class FXMLControls{
 	//FXML-defined stuff
@@ -152,6 +152,9 @@ public class FXMLControls{
 						,digitisedCoordinates[0],digitisedCoordinates[1])
 						);
 						
+						//Highlight the digitised pixels
+						TrackPoint tp = new TrackPoint(currentFrame,digitisedCoordinates,colourTolerance);
+						videoView.setImage(SwingFXUtils.toFXImage(tp.getColoured(), null));	//Update the view
 						/*
 						
 						System.out.println(String.format("Digitised X %.1f Y %.1f fitWidth %.1f fitHeight %.1f frameW %d frameHeight %d",digitisedCoordinates[0],digitisedCoordinates[1]
