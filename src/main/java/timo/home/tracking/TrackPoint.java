@@ -23,20 +23,48 @@ public class TrackPoint{
 	private int height;
 	private byte[][] fillMask;
 	
-	public TrackPoint(BIWithMeta currentFrame,double[] digitisedCoordinates,int colourTolerance){
+	public TrackPoint(int searchRadius){
+		neighbourhood = getNeighbourhood(searchRadius);
+	}
+	
+	/*Call this to refine digitisation, and to visualise the point*/
+	public double[] searchMarker(BIWithMeta currentFrame, double[] digitisedCoordinates, int tolerance){
 		this.currentFrame = currentFrame;
-		this.digitisedCoordinates = digitisedCoordinates;
-		this.colourTolerance = colourTolerance;
 		width = currentFrame.getWidth();
 		height = currentFrame.getHeight();
-		neighbourhood = getNeighbourhood(searchRadius);
-		
-		//Look for the point within the neighbourhood at this point
-		
-		//TESTING with input point
-		int[] colourIn = getColour((int) digitisedCoordinates[0],(int)  digitisedCoordinates[1]);
-		floodFill((int) digitisedCoordinates[0],(int)  digitisedCoordinates[1],colourIn[0], colourIn[1], colourIn[2], colourTolerance);
-		
+		int[] coordinates = new int[]{(int) digitisedCoordinates[0],(int)  digitisedCoordinates[1]};
+		int[] colourIn = getColour(coordinates);
+		//Refine digitisation here by looking through the neighbourhood for a matching point
+		for (int nh = 0; nh<neighbourhood.size();++nh){
+			int[] temp = new int[]{ coordinates[0]+neighbourhood.get(nh).x,coordinates[1]+neighbourhood.get(nh).y};
+			if ((temp[0] >-1 & temp[0] < width & temp[1] > -1 & temp[0] < height) 
+				&& checkColourMatch(getColour(temp),colourIn,tolerance) == true){
+				//Match found, return refined point coordinates
+				return floodFill(temp,colourIn, tolerance);						
+			}
+		}
+		return null;	//If no match was found, return null	
+	}
+	
+	public void setFrame(BIWithMeta currentFrame){
+		this.currentFrame = currentFrame;
+	}
+	
+
+	
+	public void setTolerance(int colourTolerance){
+		this.colourTolerance = colourTolerance;
+	}
+	
+	public boolean checkColourMatch(int[] colour,int[] matchColour,int tolerance){
+		if (	colour[0] >= matchColour[0]-tolerance & colour[0] <= matchColour[0]+tolerance &
+				colour[1] >= matchColour[1]-tolerance & colour[1] <= matchColour[1]+tolerance &
+				colour[2] >= matchColour[2]-tolerance & colour[2] <= matchColour[2]+tolerance )
+		{
+			return true;
+		}else{
+			return false;
+		}
 	}
 	
 	/*Clone the original frame for colouring*/
@@ -55,20 +83,18 @@ public class TrackPoint{
 	/**Flood fill marker
 	*/
 	
-	private boolean floodFill(int x, int y, int r, int g, int b, int tol){
+	private double[] floodFill(int[] coordinate, int[] matchColour, int tol){
 		colouredFrame = clone(currentFrame);
 		fillMask = new byte[width][height];
 		
 		int[][] nHood = new int[][]{{0,1},{0,-1},{1,0},{-1,0}};	//4-connected neighbourhood
 		Vector<int[]> seedList = new Vector<int[]>();
-		seedList.add(new int[]{x,y});
+		seedList.add(coordinate);
 		while (seedList.size() > 0){
 			int[] check = seedList.remove(0);	//Get the first seed, and remove from the list
-			int[] colour = getColour(check[0], check[1]);
+			int[] colour = getColour(check);
 			//Check whether colours are within tolerance
-			if (colour[0] >= r-tol & colour[0] <= r+tol &
-				colour[1] >= g-tol & colour[1] <= g+tol &
-				colour[2] >= b-tol & colour[2] <= b+tol &
+			if (checkColourMatch(colour,matchColour,tol) &
 				fillMask[check[0]][check[1]] == 0	//Hasn't been filled yet
 				){
 				fillMask[check[0]][check[1]] = 1;
@@ -78,7 +104,7 @@ public class TrackPoint{
 				for (int c = 0;c<colour.length;++c){
 					colour[c] = colour[c]<256 ? colour[c]:255;
 				}
-				colourPixel(check[0],check[1],colour);
+				colourPixel(check,colour);
 				//Add neighbouring pixels if appropriate
 				for (int nh = 0; nh<nHood.length;++nh){
 					int tempX = check[0]+nHood[nh][0];
@@ -91,20 +117,35 @@ public class TrackPoint{
 			}
 		
 		}
-		return true;
+		//Calculate the centre of the digitised points	
+		double[] fillCoordinates = new double[2];
+		int cnt = 0;
+		for (int c = 0; c<fillMask.length; ++c){
+			for (int r = 0; r<fillMask[c].length; ++r){
+				if (fillMask[c][r] == 1){
+					fillCoordinates[0] += c;
+					fillCoordinates[1] += r;
+					++cnt;
+				}
+			}
+		}
+		for (int i = 0;i<fillCoordinates.length;++i){
+			fillCoordinates[i]/=(double) cnt;
+		}
+		return fillCoordinates;
 	}
 	
-	private int[] getColour(int x, int y){
-		int pixelcolour = currentFrame.getRGB(x,y);
+	private int[] getColour(int[] coordinate){
+		int pixelcolour = currentFrame.getRGB(coordinate[0],coordinate[1]);
 		int tempR = 0xff & (pixelcolour >> 16);
 		int tempG = 0xff & (pixelcolour >> 8);
 		int tempB = 0xff & pixelcolour;
 		return new int[]{tempR,tempG,tempB};
 	}
 	
-	private void colourPixel(int x, int y, int[] colour){
+	private void colourPixel(int[] coordinate, int[] colour){
 		int pixelcolour = 0xff<<24 | colour[0] << 16 | colour[1]<<8 | colour[2];
-		colouredFrame.setRGB(x,y,pixelcolour);
+		colouredFrame.setRGB(coordinate[0],coordinate[1],pixelcolour);
 	}
 
 

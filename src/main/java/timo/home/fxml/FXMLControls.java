@@ -48,9 +48,14 @@ public class FXMLControls{
 	public boolean trackOn = false;
 	public int colourTolerance = 10;
 	public double[] digitisedCoordinates = new double[2];
-    
+	public double[] refinedCoordinates = null;
+   TrackPoint tp;// = new TrackPoint(20);
+   
     //Initialise gets called when the controller is instantiated
     public void initialize(){
+    	//Create TrackPoint
+    	tp = new TrackPoint(20);
+    	
 		//Attach Slider listener for colour slider 
 		colourSlider.valueProperty().addListener(new ChangeListener<Number>() {
 			public void changed(ObservableValue<? extends Number> ov,
@@ -153,7 +158,11 @@ public class FXMLControls{
 						);
 						
 						//Highlight the digitised pixels
-						TrackPoint tp = new TrackPoint(currentFrame,digitisedCoordinates,colourTolerance);
+						refinedCoordinates = tp.searchMarker(currentFrame,digitisedCoordinates, colourTolerance);
+						if (refinedCoordinates != null){
+							System.out.println(String.format("Refined X %.1f Y %.1f",refinedCoordinates[0],refinedCoordinates[1]));
+						}
+						
 						videoView.setImage(SwingFXUtils.toFXImage(tp.getColoured(), null));	//Update the view
 						/*
 						
