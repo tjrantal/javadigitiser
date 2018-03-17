@@ -104,6 +104,7 @@ public class VideoReader{
 	public BIWithMeta nextFrame() throws Exception{
 		try{
 			PictureWithMetadata picture = fg.getNativeFrameWithMetadata();
+			//System.out.println(String.format("Got picture tStamp %.2f duration %.2f", picture.getTimestamp(),picture.getDuration()));
 			return new BIWithMeta(AWTUtil.toBufferedImage(picture.getPicture()),picture.getTimestamp(),picture.getDuration());
 		}catch(Exception e){
 			System.out.println(e.toString());

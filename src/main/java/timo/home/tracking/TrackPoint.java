@@ -22,9 +22,16 @@ public class TrackPoint{
 	private int width;
 	private int height;
 	private byte[][] fillMask;
+	int[] colourIn = null;
 	
 	public TrackPoint(int searchRadius){
 		neighbourhood = getNeighbourhood(searchRadius);
+	}
+	
+	public void setColourToLookFor(BIWithMeta currentFrame, double[] digitisedCoordinates){
+		this.currentFrame = currentFrame;
+		int[] coordinates = new int[]{(int) digitisedCoordinates[0],(int)  digitisedCoordinates[1]};
+		colourIn = getColour(coordinates);
 	}
 	
 	/*Call this to refine digitisation, and to visualise the point*/
@@ -33,7 +40,6 @@ public class TrackPoint{
 		width = currentFrame.getWidth();
 		height = currentFrame.getHeight();
 		int[] coordinates = new int[]{(int) digitisedCoordinates[0],(int)  digitisedCoordinates[1]};
-		int[] colourIn = getColour(coordinates);
 		//Refine digitisation here by looking through the neighbourhood for a matching point
 		for (int nh = 0; nh<neighbourhood.size();++nh){
 			int[] temp = new int[]{ coordinates[0]+neighbourhood.get(nh).x,coordinates[1]+neighbourhood.get(nh).y};
@@ -98,9 +104,15 @@ public class TrackPoint{
 				fillMask[check[0]][check[1]] == 0	//Hasn't been filled yet
 				){
 				fillMask[check[0]][check[1]] = 1;
+				/*
 				colour[0]+= 50;
 				colour[1]+= 50;
 				colour[2]+= 50;
+				*/
+				colour[0]= 255;
+				colour[1]= 0;
+				colour[2]= 0;
+				
 				for (int c = 0;c<colour.length;++c){
 					colour[c] = colour[c]<256 ? colour[c]:255;
 				}
