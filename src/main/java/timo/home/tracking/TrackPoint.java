@@ -24,14 +24,24 @@ public class TrackPoint{
 	private byte[][] fillMask;
 	int[] colourIn = null;
 	
+	/**Constructor*/
 	public TrackPoint(int searchRadius){
 		neighbourhood = getNeighbourhood(searchRadius);
+	}
+	
+	/**Update search radius*/
+	public void setSearchRadius(int searchRadius){
+		if (this.searchRadius != searchRadius){
+			this.searchRadius = searchRadius;
+			neighbourhood = getNeighbourhood(searchRadius);			
+		}
 	}
 	
 	public void setColourToLookFor(BIWithMeta currentFrame, double[] digitisedCoordinates){
 		this.currentFrame = currentFrame;
 		int[] coordinates = new int[]{(int) digitisedCoordinates[0],(int)  digitisedCoordinates[1]};
 		colourIn = getColour(coordinates);
+		System.out.println(String.format("Set colour to look for r %d g %d b %d",colourIn[0],colourIn[1],colourIn[2]));
 	}
 	
 	/*Call this to refine digitisation, and to visualise the point*/
@@ -41,11 +51,15 @@ public class TrackPoint{
 		height = currentFrame.getHeight();
 		int[] coordinates = new int[]{(int) digitisedCoordinates[0],(int)  digitisedCoordinates[1]};
 		//Refine digitisation here by looking through the neighbourhood for a matching point
+		System.out.println(String.format("Looking for x %d y %d r %d g %d b %d with %d height %d",coordinates[0],coordinates[1],colourIn[0],colourIn[1],colourIn[2],width,height));
 		for (int nh = 0; nh<neighbourhood.size();++nh){
 			int[] temp = new int[]{ coordinates[0]+neighbourhood.get(nh).x,coordinates[1]+neighbourhood.get(nh).y};
-			if ((temp[0] >-1 & temp[0] < width & temp[1] > -1 & temp[0] < height) 
-				&& checkColourMatch(getColour(temp),colourIn,tolerance) == true){
+			int[] pixelColour  = getColour(temp);
+			//System.out.println(String.format("Check nh %d x %d y %d r %d g %d b %d",nh,temp[0],temp[1],pixelColour[0],pixelColour[1],pixelColour[2]));
+			if ((temp[0] >-1 & temp[0] < width & temp[1] > -1 & temp[1] < height) 
+				&& checkColourMatch(pixelColour,colourIn,tolerance) == true){
 				//Match found, return refined point coordinates
+				System.out.println(String.format("Found match nh %d x %d y %d",nh,temp[0],temp[1]));
 				return floodFill(temp,colourIn, tolerance);						
 			}
 		}
@@ -63,6 +77,12 @@ public class TrackPoint{
 	}
 	
 	public boolean checkColourMatch(int[] colour,int[] matchColour,int tolerance){
+		/*
+		System.out.println(String.format("In r %d g %d b %d check r %d g %d b %d",
+				colour[0],colour[1],colour[2],
+				matchColour[0],matchColour[1],matchColour[2]
+			));
+		*/
 		if (	colour[0] >= matchColour[0]-tolerance & colour[0] <= matchColour[0]+tolerance &
 				colour[1] >= matchColour[1]-tolerance & colour[1] <= matchColour[1]+tolerance &
 				colour[2] >= matchColour[2]-tolerance & colour[2] <= matchColour[2]+tolerance )

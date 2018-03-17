@@ -36,6 +36,9 @@ public class FXMLControls{
 	@FXML Slider colourSlider;
 	@FXML Label colourLabel;
 	
+	@FXML Slider radiusSlider;
+	@FXML Label radiusLabel;
+	
 	//VideoView
 	@FXML ImageView videoView;
 	
@@ -50,6 +53,7 @@ public class FXMLControls{
 	public int currentFrameNo = 0;
 	public boolean trackOn = false;
 	public int colourTolerance = 10;
+	public int searchRadius = 50;
 	public double[] digitisedCoordinates = new double[2];
 	public double[] refinedCoordinates = null;
    public TrackPoint tp;// = new TrackPoint(20);
@@ -60,7 +64,7 @@ public class FXMLControls{
     //Initialise gets called when the controller is instantiated
     public void initialize(){
     	//Create TrackPoint
-    	tp = new TrackPoint(100);
+    	tp = new TrackPoint(searchRadius);
     	
 		//Attach Slider listener for colour slider 
 		colourSlider.valueProperty().addListener(new ChangeListener<Number>() {
@@ -71,6 +75,17 @@ public class FXMLControls{
 				 		colourLabel.setText(String.format("Colour tolerance %02d", colourTolerance));
 				}
 		});
+		
+		//Attach Slider listener for search radius slider 
+		radiusSlider.valueProperty().addListener(new ChangeListener<Number>() {
+			public void changed(ObservableValue<? extends Number> ov,
+				 Number old_val, Number new_val) {
+				 		//Update tolerance in real time
+				 		searchRadius = new_val.intValue();
+				 		radiusLabel.setText(String.format("Search radius %03d", searchRadius));
+				}
+		});
+
     }
     
 
@@ -160,8 +175,15 @@ public class FXMLControls{
 					
 						digitisedCoordinates[0] = e.getX()/xScale;
 						digitisedCoordinates[1] = e.getY()/yScale;
-						//Set the colouor to lookg for
-						tp.setColourToLookFor(currentFrame,digitisedCoordinates);						
+						
+						System.out.println(String.format("Digitised X %.1f Y %.1f scaledX %.1f scaledY %.1f"
+							,e.getX(),e.getY()
+							,digitisedCoordinates[0],digitisedCoordinates[1])
+						);
+						
+						//Set the colour to lookg for
+						tp.setSearchRadius(searchRadius);	//Set radius search radius
+						tp.setColourToLookFor(currentFrame,digitisedCoordinates);	//Update colour to search for						
 						digitiseMarker(digitisedCoordinates);
 						
 						//System.out.println(String.format("Digitised X %.1f Y %.1f scaledX %.1f scaledY %.1f"
@@ -180,18 +202,20 @@ public class FXMLControls{
     }
     
     private boolean digitiseMarker(double[] digitisedCoordinates){
-    	
-		refinedCoordinates = tp.searchMarker(currentFrame,digitisedCoordinates, colourTolerance);
-		if (refinedCoordinates != null){
-			System.out.println(String.format("Frame %d tStamp %.2f Refined X %.1f Y %.1f",currentFrameNo,currentFrame.getTimeStamp(),refinedCoordinates[0],refinedCoordinates[1]));
-			dp.addPoint(refinedCoordinates, currentFrameNo,currentFrame.getTimeStamp());
-			//Highlight the digitised pixels
-			videoView.setImage(SwingFXUtils.toFXImage(tp.getColoured(), null));	//Update the view
-			return true;
-		}else{
-			return false;
+    	if (digitisedCoordinates != null){
+			refinedCoordinates = tp.searchMarker(currentFrame,digitisedCoordinates, colourTolerance);
+			if (refinedCoordinates != null){
+				System.out.println(String.format("Frame %d tStamp %.2f Refined X %.1f Y %.1f",currentFrameNo,currentFrame.getTimeStamp(),refinedCoordinates[0],refinedCoordinates[1]));
+				dp.addPoint(refinedCoordinates, currentFrameNo,currentFrame.getTimeStamp());
+				//Highlight the digitised pixels
+				videoView.setImage(SwingFXUtils.toFXImage(tp.getColoured(), null));	//Update the view
+				return true;
+			}else{
+				System.out.println("Could not digitise marker");
+				return false;
+			}
 		}
-						
+		return false;						
     }
     
      @FXML protected void handleFrameButtonAction(ActionEvent event) {
@@ -210,12 +234,17 @@ public class FXMLControls{
         	trackingThread.start(); 
         }else{
         	if (trackingThread != null){
+        		System.out.println("Calling trackingRunnable stop");
         		trackingRunnable.stop();
         		try{
-        			trackingThread.join();
+        			System.out.println("Waiting trackingThread join");
+        			trackingThread.join(1l);
+        			//trackingRunnable = null;
+        			//trackingThread = null;
         		}catch (Exception e){
         			System.out.println("Could not join trackingThread "+e.toString());
         		}
+        		System.out.println("trackingThread join worked");
         	}
         }
         
@@ -230,8 +259,12 @@ public class FXMLControls{
     public class TrackingRunnable implements Runnable{
     	private final FXMLControls parentObject;
     	private boolean keepgoing = true;
+    	boolean success;
     	public TrackingRunnable(FXMLControls parentObject){
     		this.parentObject = parentObject;
+    	}
+    	public void setSuccess(boolean a){
+    		this.success = a;
     	}
     	public void run(){
     		while (keepgoing){
@@ -245,49 +278,36 @@ public class FXMLControls{
 		 				}
 		 				@Override 
 		 				public void run(){
-		 					parentObject.frameSlider.increment();	//This will get the next frame as well
-		 					//Digitise point
-				 			if (!parentObject.digitiseMarker(parentObject.refinedCoordinates)){
-				 				//Notify user that tracking failed
-				 				stop();
-				 				Platform.runLater(new Runnable(){
-				 					@Override public void run(){
-				 						parentObject.toggleTrackButton();
-				 					}
-				 				});
-				 				System.out.println("Could not digitise marker");
-				 				//break;
-				 			}
+		 					parentObject.frameSlider.increment();	//This will get the next frame
+		 					boolean success = parentObject.digitiseMarker(parentObject.refinedCoordinates);
+		 					setSuccess(success);
 		 					waitLatch.countDown();
 		 				}
 		 			}.init(waitLatch)
     			);
     			try{
+    				System.out.println("Awaiting");
 	    			waitLatch.await();  			
     			}catch (Exception e){
     				System.out.println("Await failed "+e.toString());
     			}
-    			
-    			//parentObject.getNextFrame();
-    			//Digitise point
-    			/*
-    			if (!parentObject.digitiseMarker(parentObject.refinedCoordinates)){
-    				//Notify user that tracking failed
-    				stop();
-    				Platform.runLater(new Runnable(){
+    			//Check if we lost the point
+	 			if (!success){
+	 				stop();
+	 				//Notify user that tracking failed
+	 				Platform.runLater(new Runnable(){
     					@Override public void run(){
     						parentObject.toggleTrackButton();
     					}
     				});
-    				System.out.println("Could not digitise marker");
-    				//break;
-    			}
-    			*/
-    			
+	 				System.out.println("Could not digitise marker");
+	 				//break;
+	 			}
     		}
     	}
     	public void stop(){
     		keepgoing = false;
+    		System.out.println("TrackingRunnable stop called");
     	}
     }
     

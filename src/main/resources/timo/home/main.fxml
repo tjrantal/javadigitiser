@@ -14,31 +14,44 @@
 			hgap="5" vgap="5" maxHeight="Infinity" maxWidth="Infinity">
 	<padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
 	 <!--rotate="-90"-->
-	 <Label fx:id="frameLabel" text="Frame No "  GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="0" GridPane.rowSpan="1" GridPane.vgrow="always"/>
+	 
+	 	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="0" GridPane.vgrow="always"
+		text="Load Video" onAction="#handleLoadButtonAction">
+	</Button>
+	 
+	 <Label fx:id="frameLabel" text="Frame No "  GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="1" GridPane.rowSpan="1" GridPane.vgrow="always"/>
 	<Slider
-		fx:id="frameSlider" value="0" min="0" max="90" orientation="HORIZONTAL" GridPane.vgrow="always"
+		fx:id="frameSlider" value="0" min="0" max="80" orientation="HORIZONTAL" GridPane.vgrow="always"
 			showTickLabels="TRUE" showTickMarks="TRUE" blockIncrement="1" majorTickUnit="20" minorTickCount="1"
-		 GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="1" GridPane.rowSpan="1">
+		 GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="2" GridPane.rowSpan="1">
 	</Slider>
 
-	<Button fx:id="trackButton" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.vgrow="always"
-		text="Auto Track Off" onAction="#handleTrackButtonAction">
-	</Button>
+	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.vgrow="always"
+			text="Next Frame" onAction="#handleFrameButtonAction">
+		</Button>
+	
 	
 	<Label fx:id="colourLabel" text="Colour tolerance 10"  GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="4" GridPane.rowSpan="1" GridPane.vgrow="always"/>
 	<Slider
 		fx:id="colourSlider" value="10" min="0" max="200" orientation="HORIZONTAL" GridPane.vgrow="always"
 			showTickLabels="TRUE" showTickMarks="TRUE" blockIncrement="1" majorTickUnit="10" minorTickCount="1"
 		 GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="5" GridPane.rowSpan="1">
-	</Slider>	 
-
-	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="6" GridPane.vgrow="always"
-		text="Load Video" onAction="#handleLoadButtonAction">
-	</Button>
+	</Slider>
 	
-	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="7" GridPane.vgrow="always"
-		text="Next Frame" onAction="#handleFrameButtonAction">
+		<Label fx:id="radiusLabel" text="Search radius 050"  GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="6" GridPane.rowSpan="1" GridPane.vgrow="always"/>
+	<Slider
+		fx:id="radiusSlider" value="50" min="1" max="500" orientation="HORIZONTAL" GridPane.vgrow="always"
+			showTickLabels="TRUE" showTickMarks="TRUE" blockIncrement="1" majorTickUnit="50" minorTickCount="1"
+		 GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="7" GridPane.rowSpan="1">
+	</Slider>
+	
+	<Button fx:id="trackButton" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="8" GridPane.vgrow="always"
+		text="Auto Track Off" onAction="#handleTrackButtonAction">
 	</Button>
+
+
+	
+	
 
 	
 	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="9" GridPane.vgrow="always"
