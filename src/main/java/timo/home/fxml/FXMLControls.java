@@ -92,7 +92,7 @@ public class FXMLControls{
     
     @FXML protected void handleLoadButtonAction(ActionEvent event) {
         //Test reading, and displaying a frame here
-        System.out.println("Got LoadButton click");
+        //System.out.println("Got LoadButton click");
         
         //Browse for a file
         FileChooser fc = new FileChooser();
@@ -101,7 +101,7 @@ public class FXMLControls{
 				   new ExtensionFilter("Video files", Arrays.asList(new String[]{"*.mp4","*.MP4"})));
 		 File selectedFile = fc.showOpenDialog(frameLabel.getScene().getWindow());
 		 if (selectedFile != null) {
-			 System.out.println("Got File "+selectedFile.toString());
+			 //System.out.println("Got File "+selectedFile.toString());
 			 videoReader = new VideoReader(selectedFile);
 			double duration = videoReader.getDuration();
 			int	frames = videoReader.getTotalFrames();
@@ -126,7 +126,7 @@ public class FXMLControls{
 						  
 						  //Only update the frame if the slider is no longer moving
 						  if (!frameSlider.isValueChanging() & currentFrameNo !=val){
-						  		System.out.println(String.format("Start searching frame %d",val));
+						  		//System.out.println(String.format("Start searching frame %d",val));
 							  	getFrame(val);
 						  }
 					}
@@ -141,7 +141,7 @@ public class FXMLControls{
 				 		int val = (int) source.getValue();
 				 		frameLabel.setText(String.format("Frame No %d", val));
 				 		if (currentFrameNo != val){
-				 			System.out.println(String.format("MOUSE Start searching frame %d current %d",val,currentFrameNo));
+				 			//System.out.println(String.format("MOUSE Start searching frame %d current %d",val,currentFrameNo));
 					 		getFrame(val);
 					  }
 		         }
@@ -155,7 +155,7 @@ public class FXMLControls{
         		long beforeMillis = System.currentTimeMillis();
 				currentFrame = videoReader.nextFrame();
 				long afterMillis = System.currentTimeMillis();
-				System.out.println(String.format("got frame, time stamp %.2f took %.2f s to decpde",currentFrame.getTimeStamp(),((double) (afterMillis-beforeMillis))/1000d));
+				//System.out.println(String.format("got frame, time stamp %.2f took %.2f s to decpde",currentFrame.getTimeStamp(),((double) (afterMillis-beforeMillis))/1000d));
         }catch (Exception ex){
             System.err.println("Could not read frame.");
         }
@@ -176,10 +176,10 @@ public class FXMLControls{
 						digitisedCoordinates[0] = e.getX()/xScale;
 						digitisedCoordinates[1] = e.getY()/yScale;
 						
-						System.out.println(String.format("Digitised X %.1f Y %.1f scaledX %.1f scaledY %.1f"
-							,e.getX(),e.getY()
-							,digitisedCoordinates[0],digitisedCoordinates[1])
-						);
+						//System.out.println(String.format("Digitised X %.1f Y %.1f scaledX %.1f scaledY %.1f"
+						//	,e.getX(),e.getY()
+						//	,digitisedCoordinates[0],digitisedCoordinates[1])
+						//);
 						
 						//Set the colour to lookg for
 						tp.setSearchRadius(searchRadius);	//Set radius search radius
@@ -205,7 +205,9 @@ public class FXMLControls{
     	if (digitisedCoordinates != null){
 			refinedCoordinates = tp.searchMarker(currentFrame,digitisedCoordinates, colourTolerance);
 			if (refinedCoordinates != null){
-				System.out.println(String.format("Frame %d tStamp %.2f Refined X %.1f Y %.1f",currentFrameNo,currentFrame.getTimeStamp(),refinedCoordinates[0],refinedCoordinates[1]));
+				//System.out.println(String.format("Frame %d tStamp %.2f Refined X %.1f Y %.1f",currentFrameNo,currentFrame.getTimeStamp(),refinedCoordinates[0],refinedCoordinates[1]));
+				System.out.println(String.format("%d\t%f\t%f\t%f",currentFrameNo,currentFrame.getTimeStamp(),refinedCoordinates[0],refinedCoordinates[1]));
+				
 				dp.addPoint(refinedCoordinates, currentFrameNo,currentFrame.getTimeStamp());
 				//Highlight the digitised pixels
 				videoView.setImage(SwingFXUtils.toFXImage(tp.getColoured(), null));	//Update the view
@@ -220,7 +222,7 @@ public class FXMLControls{
     
      @FXML protected void handleFrameButtonAction(ActionEvent event) {
         //Test reading, and displaying a frame here
-        System.out.println("Got Frame button click");
+        //System.out.println("Got Frame button click");
         frameSlider.increment();
      }
     
@@ -234,17 +236,17 @@ public class FXMLControls{
         	trackingThread.start(); 
         }else{
         	if (trackingThread != null){
-        		System.out.println("Calling trackingRunnable stop");
+        		//System.out.println("Calling trackingRunnable stop");
         		trackingRunnable.stop();
         		try{
-        			System.out.println("Waiting trackingThread join");
+        			//System.out.println("Waiting trackingThread join");
         			trackingThread.join(1l);
         			//trackingRunnable = null;
         			//trackingThread = null;
         		}catch (Exception e){
-        			System.out.println("Could not join trackingThread "+e.toString());
+        			//System.out.println("Could not join trackingThread "+e.toString());
         		}
-        		System.out.println("trackingThread join worked");
+        		//System.out.println("trackingThread join worked");
         	}
         }
         
@@ -252,7 +254,7 @@ public class FXMLControls{
      
     public void toggleTrackButton(){
     		trackOn ^= true;
-		  System.out.println(String.format("Auto Track %s",trackOn ? "On" : "Off"));
+		  //System.out.println(String.format("Auto Track %s",trackOn ? "On" : "Off"));
 		  trackButton.setText(String.format("Auto Track %s",trackOn ? "On" : "Off"));
     }
     //Helper runnable
@@ -286,7 +288,7 @@ public class FXMLControls{
 		 			}.init(waitLatch)
     			);
     			try{
-    				System.out.println("Awaiting");
+    				//System.out.println("Awaiting");
 	    			waitLatch.await();  			
     			}catch (Exception e){
     				System.out.println("Await failed "+e.toString());
@@ -300,19 +302,19 @@ public class FXMLControls{
     						parentObject.toggleTrackButton();
     					}
     				});
-	 				System.out.println("Could not digitise marker");
+	 				//System.out.println("Could not digitise marker");
 	 				//break;
 	 			}
     		}
     	}
     	public void stop(){
     		keepgoing = false;
-    		System.out.println("TrackingRunnable stop called");
+    		//System.out.println("TrackingRunnable stop called");
     	}
     }
     
      @FXML protected void handleCloseButtonAction(ActionEvent event) {
-		  System.out.println("Got Close button click");
+		  //System.out.println("Got Close button click");
 		  
 		  closeVideo();
 	  }
@@ -326,7 +328,7 @@ public class FXMLControls{
 	 
 	 //Cleanup here
 	 public void shutdown(){
-	 	System.out.println("Called controls shutdown()");
+	 	//System.out.println("Called controls shutdown()");
 	 	closeVideo();
 	 }
 	 
@@ -339,7 +341,7 @@ public class FXMLControls{
 				currentFrame = videoReader.nextFrame();
 				++currentFrameNo;
 				long afterMillis = System.currentTimeMillis();
-				System.out.println(String.format("got next frame, time stamp %.2f took %.2f s to decpde",currentFrame.getTimeStamp(),((double) (afterMillis-beforeMillis))/1000d));
+				//System.out.println(String.format("got next frame, time stamp %.2f took %.2f s to decpde",currentFrame.getTimeStamp(),((double) (afterMillis-beforeMillis))/1000d));
 								
         }catch (Exception ex){
             System.err.println("Could not read frame.");
@@ -350,7 +352,7 @@ public class FXMLControls{
 	 public void getFrame(int frameNo){
 	 	//Do nothing if the requested frame is already up
 	 	if (frameNo == currentFrameNo){
-	 		System.out.println("Already the current frame");
+	 		//System.out.println("Already the current frame");
 	 		return;
 	 	}
 	 	 	
@@ -368,7 +370,7 @@ public class FXMLControls{
 					currentFrame = videoReader.readFrame(frameNo);
 				
 					long afterMillis = System.currentTimeMillis();
-					System.out.println(String.format("got frame, time stamp %.2f took %.2f s to decpde",currentFrame.getTimeStamp(),((double) (afterMillis-beforeMillis))/1000d));
+					//System.out.println(String.format("got frame, time stamp %.2f took %.2f s to decpde",currentFrame.getTimeStamp(),((double) (afterMillis-beforeMillis))/1000d));
 			  }catch (Exception ex){
 					System.err.println("Could not read frame.");
 			  }
