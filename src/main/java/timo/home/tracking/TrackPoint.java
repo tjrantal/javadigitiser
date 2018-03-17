@@ -41,7 +41,7 @@ public class TrackPoint{
 		this.currentFrame = currentFrame;
 		int[] coordinates = new int[]{(int) digitisedCoordinates[0],(int)  digitisedCoordinates[1]};
 		colourIn = getColour(coordinates);
-		System.out.println(String.format("Set colour to look for r %d g %d b %d",colourIn[0],colourIn[1],colourIn[2]));
+		//System.out.println(String.format("Set colour to look for r %d g %d b %d",colourIn[0],colourIn[1],colourIn[2]));
 	}
 	
 	/*Call this to refine digitisation, and to visualise the point*/
@@ -51,7 +51,7 @@ public class TrackPoint{
 		height = currentFrame.getHeight();
 		int[] coordinates = new int[]{(int) digitisedCoordinates[0],(int)  digitisedCoordinates[1]};
 		//Refine digitisation here by looking through the neighbourhood for a matching point
-		System.out.println(String.format("Looking for x %d y %d r %d g %d b %d with %d height %d",coordinates[0],coordinates[1],colourIn[0],colourIn[1],colourIn[2],width,height));
+		//System.out.println(String.format("Looking for x %d y %d r %d g %d b %d with %d height %d",coordinates[0],coordinates[1],colourIn[0],colourIn[1],colourIn[2],width,height));
 		for (int nh = 0; nh<neighbourhood.size();++nh){
 			int[] temp = new int[]{ coordinates[0]+neighbourhood.get(nh).x,coordinates[1]+neighbourhood.get(nh).y};
 			int[] pixelColour  = getColour(temp);
@@ -59,7 +59,7 @@ public class TrackPoint{
 			if ((temp[0] >-1 & temp[0] < width & temp[1] > -1 & temp[1] < height) 
 				&& checkColourMatch(pixelColour,colourIn,tolerance) == true){
 				//Match found, return refined point coordinates
-				System.out.println(String.format("Found match nh %d x %d y %d",nh,temp[0],temp[1]));
+				//System.out.println(String.format("Found match nh %d x %d y %d",nh,temp[0],temp[1]));
 				return floodFill(temp,colourIn, tolerance);						
 			}
 		}
