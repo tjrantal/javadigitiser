@@ -58,10 +58,14 @@
 		text="Close Video" onAction="#handleCloseButtonAction">
 	</Button>
 	
+	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="10" GridPane.vgrow="always"
+		text="Extract frame" onAction="#handleExtractButtonAction">
+	</Button>
+	
 			 
 	<!--VideoView-->
 	<ImageView
-			GridPane.columnIndex="3" GridPane.columnSpan="6" GridPane.rowIndex="0" GridPane.rowSpan="10"
+			GridPane.columnIndex="3" GridPane.columnSpan="6" GridPane.rowIndex="0" GridPane.rowSpan="11"
 		    fx:id="videoView"
 		    fitWidth="600.0"
 		    fitHeight="450.0"

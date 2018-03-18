@@ -21,6 +21,9 @@ import javafx.geometry.Bounds;
 import javafx.application.Platform;
 import java.util.concurrent.CountDownLatch;	//Enable waiting for Platform.runLater..
 
+//Extract frame
+import javax.imageio.ImageIO;
+
 import timo.home.jcodec.VideoReader;
 import timo.home.jcodec.BIWithMeta;
 import timo.home.tracking.TrackPoint;
@@ -60,6 +63,7 @@ public class FXMLControls{
    private DigitisedPoints dp;
    private Thread trackingThread = null;
    private TrackingRunnable trackingRunnable = null;
+   private File currentFile;
    
     //Initialise gets called when the controller is instantiated
     public void initialize(){
@@ -100,8 +104,9 @@ public class FXMLControls{
 		 fc.getExtensionFilters().addAll(
 				   new ExtensionFilter("Video files", Arrays.asList(new String[]{"*.mp4","*.MP4"})));
 		 File selectedFile = fc.showOpenDialog(frameLabel.getScene().getWindow());
+		 
 		 if (selectedFile != null) {
-			 //System.out.println("Got File "+selectedFile.toString());
+			 currentFile = selectedFile;
 			 videoReader = new VideoReader(selectedFile);
 			double duration = videoReader.getDuration();
 			int	frames = videoReader.getTotalFrames();
@@ -224,6 +229,16 @@ public class FXMLControls{
         //Test reading, and displaying a frame here
         //System.out.println("Got Frame button click");
         frameSlider.increment();
+     }
+     
+     @FXML protected void handleExtractButtonAction(ActionEvent event) {
+        System.out.println("Extract");
+        System.out.println("Got File "+currentFile.toString());
+        try{
+        	ImageIO.write(currentFrame, "png", new File(String.format("frameExport_%s_%05d",currentFile.getName(), currentFrameNo)));
+        }catch (Exception e){
+        	System.out.println("Could not save Image");
+        }
      }
     
      @FXML protected void handleTrackButtonAction(ActionEvent event) {
