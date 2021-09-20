@@ -102,7 +102,7 @@ public class FXMLControls{
         FileChooser fc = new FileChooser();
 		 fc.setTitle("Select MP4 videofile");
 		 fc.getExtensionFilters().addAll(
-				   new ExtensionFilter("Video files", Arrays.asList(new String[]{"*.mp4","*.MP4"})));
+				   new ExtensionFilter("Video files", Arrays.asList(new String[]{"*.mp4","*.MP4","*.MOV","*.mov"})));
 		 File selectedFile = fc.showOpenDialog(frameLabel.getScene().getWindow());
 		 
 		 if (selectedFile != null) {

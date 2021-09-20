@@ -67,8 +67,8 @@
 	<ImageView
 			GridPane.columnIndex="3" GridPane.columnSpan="6" GridPane.rowIndex="0" GridPane.rowSpan="11"
 		    fx:id="videoView"
-		    fitWidth="600.0"
-		    fitHeight="450.0"
+		    fitWidth="1200.0"
+		    fitHeight="600.0"
 		    pickOnBounds="true"
 		    preserveRatio="true"
 		>
