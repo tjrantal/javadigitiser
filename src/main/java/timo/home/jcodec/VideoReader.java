@@ -118,7 +118,7 @@ public class VideoReader{
 		}
 	}
 	
-	//Try to work around jcodec and jcodec.javase module conflicts
+	//Try to work around jcodec and jcodec.javase module conflicts, copied from org.jcodec.scale.AWTUtil
 	
 	public BufferedImage toBufferedImage(Picture src) {
 		if (src.getColor() != ColorSpace.BGR) {
