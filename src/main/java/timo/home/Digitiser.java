@@ -20,7 +20,7 @@ public class Digitiser extends Application{
 	public void start(Stage stage) throws Exception{
 		final FXMLLoader loader  = new FXMLLoader(getClass().getResource("main.fxml"));
 		Parent root = loader.load();
-		Scene scene = new Scene(root, 1400, 850);
+		Scene scene = new Scene(root, 1000, 650);
 		stage.setTitle("Digitiser");
 		stage.setScene(scene);
 		

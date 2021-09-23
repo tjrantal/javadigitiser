@@ -21,6 +21,12 @@ import javafx.geometry.Bounds;
 import javafx.application.Platform;
 import java.util.concurrent.CountDownLatch;	//Enable waiting for Platform.runLater..
 
+import java.util.ArrayList;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 //Extract frame
 import javax.imageio.ImageIO;
 
@@ -28,6 +34,7 @@ import timo.home.jcodec.VideoReader;
 import timo.home.jcodec.BIWithMeta;
 import timo.home.tracking.TrackPoint;
 import timo.home.tracking.DigitisedPoints;
+import timo.home.tracking.MarkerSet;
 
 public class FXMLControls{
 	//FXML-defined stuff
@@ -48,6 +55,8 @@ public class FXMLControls{
 	//Track Button
 	@FXML Button trackButton;
 	
+	@FXML ComboBox markerBox;
+	@FXML ToggleButton trackToggle;
 	//JCodec videoreader
 	private VideoReader videoReader = null;
 	private BIWithMeta currentFrame;
@@ -59,6 +68,10 @@ public class FXMLControls{
 	public int searchRadius = 50;
 	public double[] digitisedCoordinates = new double[2];
 	public double[] refinedCoordinates = null;
+	
+	public MarkerSet mSet = null;
+	ArrayList<String> markerLabels = null;
+	
    public TrackPoint tp;// = new TrackPoint(20);
    private DigitisedPoints dp;
    private Thread trackingThread = null;
@@ -92,7 +105,45 @@ public class FXMLControls{
 
     }
     
-
+	//Implement to read a marker file for marker labels
+	@FXML protected void handleMarkerButtonAction(ActionEvent event){
+		//Read a file in here
+		//Browse for a file
+        FileChooser fc = new FileChooser();
+		 fc.setTitle("Select marker set");
+		 fc.getExtensionFilters().addAll(
+				   new ExtensionFilter("Marker set files", Arrays.asList(new String[]{"*.txt","*.TXT"})));
+		 File selectedFile = fc.showOpenDialog(frameLabel.getScene().getWindow());
+		  if (selectedFile != null) {
+				try{
+					BufferedReader br=new BufferedReader(new FileReader(selectedFile));  //creates a buffering character input stream  
+					String line;  
+					markerLabels = new ArrayList<String>();
+					while((line=br.readLine())!=null){  
+						markerLabels.add(line);      //appends line to string buffer  
+					}  
+					br.close();    //closes the stream and release the resources  
+				}catch(Exception e){System.out.println("Could not read markers "+e.toString());}
+				if (markerLabels != null){
+					mSet = new MarkerSet(markerLabels);
+					//Create the dropdown menu here into markerBox
+					ObservableList<String> options = FXCollections.observableArrayList(markerLabels);
+					markerBox.setItems(options);
+					markerBox.setValue(mSet.set.get(0).label);
+					markerBox.setOnAction​(new EventHandler<ActionEvent>{
+						public void handle(Event e){
+							trackToggle.setSelected(mSet.set.get(markerLabels.indexOf(markerBox.getValue())).trackOn);
+						}
+					});
+				}
+		  }
+	}
+	
+	//Implement to toggle marker on/off
+	@FXML protected void handleTrackToggle(ActionEvent event){
+		mSet.set.get(markerLabels.indexOf(markerBox.getValue())).trackOn = trackToggle.isSelected();
+	}
+	
     
     @FXML protected void handleLoadButtonAction(ActionEvent event) {
         //Test reading, and displaying a frame here

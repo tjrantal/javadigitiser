@@ -58,16 +58,25 @@
 		text="Close Video" onAction="#handleCloseButtonAction">
 	</Button>
 	
-	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="10" GridPane.vgrow="always"
-		text="Extract frame" onAction="#handleExtractButtonAction">
+	<!--Load marker set-->
+	<Button GridPane.columnIndex="0" GridPane.columnSpan="1" GridPane.rowIndex="10" GridPane.vgrow="always"
+		text="Load markerset" onAction="#handleMarkerButtonAction">
 	</Button>
 	
+	<!--Current marker-->
+	<ComboBox fx:id="markerBox" GridPane.columnIndex="1" GridPane.columnSpan="1" GridPane.rowIndex="10" GridPane.vgrow="always">
+	</ComboBox>
+
+	<!--Auto track or not-->
+	<ToggleButton fx:id="trackToggle" GridPane.columnIndex="2" GridPane.columnSpan="1" GridPane.rowIndex="10" GridPane.vgrow="always"
+		 text="Track Marker" onAction="#handleTrackToggle"> 
+	</ToggleButton>
 			 
 	<!--VideoView-->
 	<ImageView
 			GridPane.columnIndex="3" GridPane.columnSpan="6" GridPane.rowIndex="0" GridPane.rowSpan="11"
 		    fx:id="videoView"
-		    fitWidth="1200.0"
+		    fitWidth="800.0"
 		    fitHeight="600.0"
 		    pickOnBounds="true"
 		    preserveRatio="true"
