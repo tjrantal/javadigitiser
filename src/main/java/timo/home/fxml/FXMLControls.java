@@ -26,6 +26,7 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 
 //Extract frame
 import javax.imageio.ImageIO;
@@ -130,8 +131,9 @@ public class FXMLControls{
 					ObservableList<String> options = FXCollections.observableArrayList(markerLabels);
 					markerBox.setItems(options);
 					markerBox.setValue(mSet.set.get(0).label);
-					markerBox.setOnAction​(new EventHandler<ActionEvent>{
-						public void handle(Event e){
+					markerBox.setOnAction(new EventHandler<ActionEvent>(){
+						@Override
+						public void handle(ActionEvent e){
 							trackToggle.setSelected(mSet.set.get(markerLabels.indexOf(markerBox.getValue())).trackOn);
 						}
 					});
