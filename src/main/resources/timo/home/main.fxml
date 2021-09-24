@@ -54,8 +54,12 @@
 	
 
 	
-	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="9" GridPane.vgrow="always"
+	<Button GridPane.columnIndex="0" GridPane.columnSpan="1" GridPane.rowIndex="9" GridPane.vgrow="always"
 		text="Close Video" onAction="#handleCloseButtonAction">
+	</Button>
+	
+	<Button GridPane.columnIndex="1" GridPane.columnSpan="1" GridPane.rowIndex="9" GridPane.vgrow="always"
+		text="Show digitised" onAction="#handleDisplayCoordsAction">
 	</Button>
 	
 	<!--Load marker set-->

@@ -3,6 +3,9 @@ package timo.home.fxml;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.text.Text;
+import javafx.scene.text.Font;
+import javafx.scene.layout.GridPane;
+import javafx.geometry.Insets;
 
 //UI stuff
 import javafx.scene.chart.*;		//Chart
@@ -33,9 +36,10 @@ import javax.imageio.ImageIO;
 
 import timo.home.jcodec.VideoReader;
 import timo.home.jcodec.BIWithMeta;
-import timo.home.tracking.TrackPoint;
-import timo.home.tracking.DigitisedPoints;
+//import timo.home.tracking.TrackPoint;
+//import timo.home.tracking.DigitisedPoints;
 import timo.home.tracking.MarkerSet;
+import timo.home.tracking.Point;
 
 public class FXMLControls{
 	//FXML-defined stuff
@@ -313,6 +317,31 @@ public class FXMLControls{
         frameSlider.increment();
      }
      
+	 @FXML protected void handleDisplayCoordsAction(ActionEvent event){
+		String output = "LABEL\tFrameNo\ttStamp\tX\tY\n";
+		for (int m = 0; m<mSet.set.size();++m){
+			for (int p = 0; p<mSet.set.get(m).dp.points.size();++p){
+				Point tempPoint = mSet.set.get(m).dp.points.get(p);
+				output+=String.format("%s\t%d\t%f\t%f\t%f\n",mSet.set.get(m).label,tempPoint.frameNo,tempPoint.timeStamp,tempPoint.x,tempPoint.y);
+			}
+		}
+		
+		//Pop up a text view, and print the string
+		GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        Text infoText = new Text();
+		infoText.setText(output);
+		infoText.setFont(new Font(12));
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.add(infoText, 0, 4, 2, 1);
+        //Dialog<String> dlg = new Dialog<String>();
+		DialogPane dlg = new DialogPane();
+		dlg.setContent(grid);
+        dlg.show();
+		
+	 }
+	 
      @FXML protected void handleExtractButtonAction(ActionEvent event) {
         System.out.println("Extract");
         System.out.println("Got File "+currentFile.toString());
@@ -394,6 +423,7 @@ public class FXMLControls{
 							}
 							
 		 					setSuccess(success);
+							--currentMarker;	//Decrease currentMarker by one to be within range
 		 					setCurrentMarker(currentMarker);
 							waitLatch.countDown();
 		 				}
