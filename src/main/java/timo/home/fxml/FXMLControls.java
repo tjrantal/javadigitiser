@@ -61,6 +61,7 @@ public class FXMLControls{
 	//JCodec videoreader
 	private VideoReader videoReader = null;
 	private BIWithMeta currentFrame;
+	private BIWithMeta colouredFrame;
 	
 	//For UI
 	public int currentFrameNo = 0;
@@ -73,8 +74,8 @@ public class FXMLControls{
 	public MarkerSet mSet = null;
 	ArrayList<String> markerLabels = null;
 	
-   public TrackPoint tp;// = new TrackPoint(20);
-   private DigitisedPoints dp;
+   //public TrackPoint tp;// = new TrackPoint(20);
+   //private DigitisedPoints dp;
    private Thread trackingThread = null;
    private TrackingRunnable trackingRunnable = null;
    private File currentFile;
@@ -82,7 +83,7 @@ public class FXMLControls{
     //Initialise gets called when the controller is instantiated
     public void initialize(){
     	//Create TrackPoint
-    	tp = new TrackPoint(searchRadius);
+    	//tp = new TrackPoint(searchRadius);
     	
 		//Attach Slider listener for colour slider 
 		colourSlider.valueProperty().addListener(new ChangeListener<Number>() {
@@ -91,6 +92,9 @@ public class FXMLControls{
 				 		//Update tolerance in real time
 				 		colourTolerance = new_val.intValue();
 				 		colourLabel.setText(String.format("Colour tolerance %02d", colourTolerance));
+						
+						//Set tp colourTolerance
+						mSet.set.get(markerLabels.indexOf(markerBox.getValue())).tp.setTolerance(colourTolerance);
 				}
 		});
 		
@@ -101,6 +105,8 @@ public class FXMLControls{
 				 		//Update tolerance in real time
 				 		searchRadius = new_val.intValue();
 				 		radiusLabel.setText(String.format("Search radius %03d", searchRadius));
+						//Set tp searchRadius
+						mSet.set.get(markerLabels.indexOf(markerBox.getValue())).tp.setSearchRadius(searchRadius);
 				}
 		});
 
@@ -135,6 +141,9 @@ public class FXMLControls{
 						@Override
 						public void handle(ActionEvent e){
 							trackToggle.setSelected(mSet.set.get(markerLabels.indexOf(markerBox.getValue())).trackOn);
+							//Set sliders
+							colourSlider.setValue(mSet.set.get(markerLabels.indexOf(markerBox.getValue())).tp.getTolerance());
+							radiusSlider.setValue(mSet.set.get(markerLabels.indexOf(markerBox.getValue())).tp.getSearchRadius());
 						}
 					});
 				}
@@ -217,10 +226,11 @@ public class FXMLControls{
         }catch (Exception ex){
             System.err.println("Could not read frame.");
         }
+		colouredFrame = new BIWithMeta(currentFrame);
         videoView.setImage(SwingFXUtils.toFXImage(currentFrame, null));
 			
 			//Add DigitisedPoints for digitisation
-			dp = new DigitisedPoints();
+			//dp = new DigitisedPoints();
 			
 			//Attach mouse released listener on the videoView to digitise markers
 			videoView.setOnMouseReleased(new EventHandler<MouseEvent>() {
@@ -239,10 +249,15 @@ public class FXMLControls{
 						//	,digitisedCoordinates[0],digitisedCoordinates[1])
 						//);
 						
+						//Get the current marker, set searchRadius, set marker indice
+						int markerIndex = markerLabels.indexOf(markerBox.getValue());
+						
+						mSet.set.get(markerIndex).tp.setSearchRadius(searchRadius);	//Set radius search radius
+						mSet.set.get(markerIndex).tp.setColourToLookFor(currentFrame,digitisedCoordinates);	//Set radius search radius
 						//Set the colour to lookg for
-						tp.setSearchRadius(searchRadius);	//Set radius search radius
-						tp.setColourToLookFor(currentFrame,digitisedCoordinates);	//Update colour to search for						
-						digitiseMarker(digitisedCoordinates);
+						//tp.setSearchRadius(searchRadius);	//Set radius search radius
+						//tp.setColourToLookFor(currentFrame,digitisedCoordinates);	//Update colour to search for						
+						digitiseMarker(digitisedCoordinates,markerIndex);
 						
 						//System.out.println(String.format("Digitised X %.1f Y %.1f scaledX %.1f scaledY %.1f"
 						//,e.getX(),e.getY()
@@ -259,16 +274,21 @@ public class FXMLControls{
                 
     }
     
-    private boolean digitiseMarker(double[] digitisedCoordinates){
+    private boolean digitiseMarker(double[] digitisedCoordinates, int markerIndex){
     	if (digitisedCoordinates != null){
-			refinedCoordinates = tp.searchMarker(currentFrame,digitisedCoordinates, colourTolerance);
+			
+			refinedCoordinates = mSet.set.get(markerIndex).tp.searchMarker(currentFrame,digitisedCoordinates, mSet.set.get(markerIndex).tp.getTolerance());
 			if (refinedCoordinates != null){
 				//System.out.println(String.format("Frame %d tStamp %.2f Refined X %.1f Y %.1f",currentFrameNo,currentFrame.getTimeStamp(),refinedCoordinates[0],refinedCoordinates[1]));
-				System.out.println(String.format("%d\t%f\t%f\t%f",currentFrameNo,currentFrame.getTimeStamp(),refinedCoordinates[0],refinedCoordinates[1]));
+				System.out.println(String.format("%d\t%s\t%f\t%f\t%f",currentFrameNo,markerLabels.get(markerIndex),currentFrame.getTimeStamp(),refinedCoordinates[0],refinedCoordinates[1]));
 				
-				dp.addPoint(refinedCoordinates, currentFrameNo,currentFrame.getTimeStamp());
-				//Highlight the digitised pixels
-				videoView.setImage(SwingFXUtils.toFXImage(tp.getColoured(), null));	//Update the view
+				mSet.set.get(markerIndex).dp.addPoint(refinedCoordinates, currentFrameNo,currentFrame.getTimeStamp());
+				
+				
+				//Highlight the digitised pixels, add the colouring of the digitised marker	
+				colouredFrame = colourMask(colouredFrame,mSet.set.get(markerIndex).tp.getColourCoordinates(),new int[]{255,0,0});
+				
+				videoView.setImage(SwingFXUtils.toFXImage(colouredFrame, null));	//Update the view
 				return true;
 			}else{
 				System.out.println("Could not digitise marker");
@@ -277,6 +297,15 @@ public class FXMLControls{
 		}
 		return false;						
     }
+	
+	private BIWithMeta colourMask(BIWithMeta im, ArrayList<int[]> coords, int[] colour){
+		//System.out.println(String.format("colourMask coords.size() %d",coords.size()));
+		for(int i = 0;i<coords.size();++i){
+			int pixelcolour = 0xff<<24 | colour[0] << 16 | colour[1]<<8 | colour[2];
+			im.setRGB(coords.get(i)[0],coords.get(i)[1],pixelcolour);
+		}
+		return im;
+	}
     
      @FXML protected void handleFrameButtonAction(ActionEvent event) {
         //Test reading, and displaying a frame here
@@ -330,12 +359,17 @@ public class FXMLControls{
     	private final FXMLControls parentObject;
     	private boolean keepgoing = true;
     	boolean success;
+		int currentMarker = -1;
     	public TrackingRunnable(FXMLControls parentObject){
     		this.parentObject = parentObject;
     	}
     	public void setSuccess(boolean a){
     		this.success = a;
     	}
+		public void setCurrentMarker(int currentMarker){
+			this.currentMarker = currentMarker;
+		}
+		
     	public void run(){
     		while (keepgoing){
     			//Load next frame in runLater call, and wait for the call to finish
@@ -349,9 +383,19 @@ public class FXMLControls{
 		 				@Override 
 		 				public void run(){
 		 					parentObject.frameSlider.increment();	//This will get the next frame
-		 					boolean success = parentObject.digitiseMarker(parentObject.refinedCoordinates);
+							//Run through markers here
+							int currentMarker = 0;
+							boolean success = true;
+							while (currentMarker < parentObject.markerLabels.size() && success){
+								if (parentObject.mSet.set.get(currentMarker).trackOn){
+									success = parentObject.digitiseMarker(parentObject.refinedCoordinates,currentMarker);
+								}
+								++currentMarker;
+							}
+							
 		 					setSuccess(success);
-		 					waitLatch.countDown();
+		 					setCurrentMarker(currentMarker);
+							waitLatch.countDown();
 		 				}
 		 			}.init(waitLatch)
     			);
@@ -415,6 +459,7 @@ public class FXMLControls{
             System.err.println("Could not read frame.");
         }
         videoView.setImage(SwingFXUtils.toFXImage(currentFrame, null));
+		colouredFrame = new BIWithMeta(currentFrame);
 	 }
 	 
 	 public void getFrame(int frameNo){
@@ -443,6 +488,7 @@ public class FXMLControls{
 					System.err.println("Could not read frame.");
 			  }
 			  videoView.setImage(SwingFXUtils.toFXImage(currentFrame, null));
+			  colouredFrame = new BIWithMeta(currentFrame);
 	 	}
 	 }
 	 

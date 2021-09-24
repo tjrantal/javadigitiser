@@ -7,8 +7,9 @@ public class Marker{
 	public String label;
 	public boolean trackOn = false;
 	
+	/*Constructor with just label*/
 	public Marker(String label){
-		this(label, null, null);
+		this(label, new TrackPoint(), new DigitisedPoints());
 	}
 	
 	

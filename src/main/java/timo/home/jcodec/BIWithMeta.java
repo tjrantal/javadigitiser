@@ -12,6 +12,13 @@ public class BIWithMeta extends BufferedImage{
 		this.timeStamp = timeStamp;
 		this.duration = duration;
 	}
+	
+	public BIWithMeta(BIWithMeta bi){
+		super(bi.getWidth(),bi.getHeight(),bi.getType());
+		setData(bi.getData());
+		this.timeStamp = bi.getTimeStamp();
+		this.duration = bi.getDuration();
+	}
 
 	public double getTimeStamp(){
 		return timeStamp;

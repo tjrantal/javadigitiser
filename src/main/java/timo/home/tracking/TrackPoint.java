@@ -13,20 +13,34 @@ import timo.home.jcodec.BIWithMeta;
 
 
 public class TrackPoint{
+	private static final int SEARCH_DEFAULT_RADIUS = 20;
 	private BIWithMeta currentFrame;
-	private BufferedImage colouredFrame;
-	private int colourTolerance;
+	private int colourTolerance = 10;
 	private double[] digitisedCoordinates; // = new double[2];
-	private int searchRadius = 20;
+	private int searchRadius = SEARCH_DEFAULT_RADIUS;
 	private ArrayList<PointHelper> neighbourhood;
 	private int width;
 	private int height;
 	private byte[][] fillMask;
+	private ArrayList<int[]> colourCoordinates = null;
 	int[] colourIn = null;
 	
 	/**Constructor*/
 	public TrackPoint(int searchRadius){
 		neighbourhood = getNeighbourhood(searchRadius);
+	}
+	
+	/**Constructor*/
+	public TrackPoint(){
+		this(SEARCH_DEFAULT_RADIUS);
+	}
+	
+	public byte[][] getMask(){
+		return fillMask;
+	}
+	
+	public ArrayList<int[]> getColourCoordinates(){
+		return colourCoordinates;
 	}
 	
 	/**Update search radius*/
@@ -35,6 +49,10 @@ public class TrackPoint{
 			this.searchRadius = searchRadius;
 			neighbourhood = getNeighbourhood(searchRadius);			
 		}
+	}
+	
+	public int getSearchRadius(){
+		return searchRadius;
 	}
 	
 	public void setColourToLookFor(BIWithMeta currentFrame, double[] digitisedCoordinates){
@@ -76,6 +94,10 @@ public class TrackPoint{
 		this.colourTolerance = colourTolerance;
 	}
 	
+	public int getTolerance(){
+		return colourTolerance;
+	}
+	
 	public boolean checkColourMatch(int[] colour,int[] matchColour,int tolerance){
 		/*
 		System.out.println(String.format("In r %d g %d b %d check r %d g %d b %d",
@@ -101,16 +123,17 @@ public class TrackPoint{
 	 return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	}
 	
-	public BufferedImage getColoured(){
-		return colouredFrame;
-	}
+	//public BufferedImage getColoured(){
+	//	return colouredFrame;
+	//}
 	
 
 	/**Flood fill marker
 	*/
 	
 	private double[] floodFill(int[] coordinate, int[] matchColour, int tol){
-		colouredFrame = clone(currentFrame);
+		colourCoordinates = null;
+		//colouredFrame = clone(currentFrame);
 		fillMask = new byte[width][height];
 		
 		int[][] nHood = new int[][]{{0,1},{0,-1},{1,0},{-1,0}};	//4-connected neighbourhood
@@ -136,7 +159,7 @@ public class TrackPoint{
 				for (int c = 0;c<colour.length;++c){
 					colour[c] = colour[c]<256 ? colour[c]:255;
 				}
-				colourPixel(check,colour);
+				//colourPixel(check,colour);
 				//Add neighbouring pixels if appropriate
 				for (int nh = 0; nh<nHood.length;++nh){
 					int tempX = check[0]+nHood[nh][0];
@@ -151,6 +174,7 @@ public class TrackPoint{
 		}
 		//Calculate the centre of the digitised points	
 		double[] fillCoordinates = new double[2];
+		colourCoordinates = new ArrayList<int[]>();
 		int cnt = 0;
 		for (int c = 0; c<fillMask.length; ++c){
 			for (int r = 0; r<fillMask[c].length; ++r){
@@ -158,12 +182,14 @@ public class TrackPoint{
 					fillCoordinates[0] += c;
 					fillCoordinates[1] += r;
 					++cnt;
+					colourCoordinates.add(new int[]{c,r});
 				}
 			}
 		}
 		for (int i = 0;i<fillCoordinates.length;++i){
 			fillCoordinates[i]/=(double) cnt;
 		}
+		//System.out.println(String.format("Got coord colourCoordinates.size() %d",colourCoordinates.size()));
 		return fillCoordinates;
 	}
 	
@@ -175,10 +201,12 @@ public class TrackPoint{
 		return new int[]{tempR,tempG,tempB};
 	}
 	
+	/*
 	private void colourPixel(int[] coordinate, int[] colour){
 		int pixelcolour = 0xff<<24 | colour[0] << 16 | colour[1]<<8 | colour[2];
 		colouredFrame.setRGB(coordinate[0],coordinate[1],pixelcolour);
 	}
+	*/
 
 
 	/**Get pixel neighbourhood coordinates in a concentric circle
