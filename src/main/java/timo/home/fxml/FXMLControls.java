@@ -30,6 +30,11 @@ import java.io.BufferedReader;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
+import javafx.scene.control.TextArea;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.scene.layout.VBox;
+import java.util.Locale;
 
 //Extract frame
 import javax.imageio.ImageIO;
@@ -73,7 +78,6 @@ public class FXMLControls{
 	public int colourTolerance = 10;
 	public int searchRadius = 50;
 	public double[] digitisedCoordinates = new double[2];
-	public double[] refinedCoordinates = null;
 	
 	public MarkerSet mSet = null;
 	ArrayList<String> markerLabels = null;
@@ -258,6 +262,8 @@ public class FXMLControls{
 						
 						mSet.set.get(markerIndex).tp.setSearchRadius(searchRadius);	//Set radius search radius
 						mSet.set.get(markerIndex).tp.setColourToLookFor(currentFrame,digitisedCoordinates);	//Set radius search radius
+						
+						mSet.set.get(markerIndex).dp.lastKnown = new double[]{digitisedCoordinates[0],digitisedCoordinates[1]};
 						//Set the colour to lookg for
 						//tp.setSearchRadius(searchRadius);	//Set radius search radius
 						//tp.setColourToLookFor(currentFrame,digitisedCoordinates);	//Update colour to search for						
@@ -281,12 +287,12 @@ public class FXMLControls{
     private boolean digitiseMarker(double[] digitisedCoordinates, int markerIndex){
     	if (digitisedCoordinates != null){
 			
-			refinedCoordinates = mSet.set.get(markerIndex).tp.searchMarker(currentFrame,digitisedCoordinates, mSet.set.get(markerIndex).tp.getTolerance());
-			if (refinedCoordinates != null){
+			mSet.set.get(markerIndex).dp.lastKnown  = mSet.set.get(markerIndex).tp.searchMarker(currentFrame,digitisedCoordinates, mSet.set.get(markerIndex).tp.getTolerance());
+			if (mSet.set.get(markerIndex).dp.lastKnown  != null){
 				//System.out.println(String.format("Frame %d tStamp %.2f Refined X %.1f Y %.1f",currentFrameNo,currentFrame.getTimeStamp(),refinedCoordinates[0],refinedCoordinates[1]));
-				System.out.println(String.format("%d\t%s\t%f\t%f\t%f",currentFrameNo,markerLabels.get(markerIndex),currentFrame.getTimeStamp(),refinedCoordinates[0],refinedCoordinates[1]));
+				System.out.println(String.format("%d\t%s\t%f\t%f\t%f",currentFrameNo,markerLabels.get(markerIndex),currentFrame.getTimeStamp(),mSet.set.get(markerIndex).dp.lastKnown[0],mSet.set.get(markerIndex).dp.lastKnown[1]));
 				
-				mSet.set.get(markerIndex).dp.addPoint(refinedCoordinates, currentFrameNo,currentFrame.getTimeStamp());
+				mSet.set.get(markerIndex).dp.addPoint(mSet.set.get(markerIndex).dp.lastKnown, currentFrameNo,currentFrame.getTimeStamp());
 				
 				
 				//Highlight the digitised pixels, add the colouring of the digitised marker	
@@ -322,24 +328,17 @@ public class FXMLControls{
 		for (int m = 0; m<mSet.set.size();++m){
 			for (int p = 0; p<mSet.set.get(m).dp.points.size();++p){
 				Point tempPoint = mSet.set.get(m).dp.points.get(p);
-				output+=String.format("%s\t%d\t%f\t%f\t%f\n",mSet.set.get(m).label,tempPoint.frameNo,tempPoint.timeStamp,tempPoint.x,tempPoint.y);
+				output+=String.format(Locale.ROOT,"%s\t%d\t%f\t%f\t%f\n",mSet.set.get(m).label,tempPoint.frameNo,tempPoint.timeStamp,tempPoint.x,tempPoint.y);
 			}
 		}
 		
-		//Pop up a text view, and print the string
-		GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        Text infoText = new Text();
-		infoText.setText(output);
-		infoText.setFont(new Font(12));
-        grid.setPadding(new Insets(10, 10, 10, 10));
-        grid.add(infoText, 0, 4, 2, 1);
-        //Dialog<String> dlg = new Dialog<String>();
-		DialogPane dlg = new DialogPane();
-		dlg.setContent(grid);
-        dlg.show();
-		
+		//Pop up a text view, and show the coordinate string -> copy paste to a text editor of your choice
+		Scene scene = new Scene(new VBox(new TextArea(output)),400,400);
+		Stage stage = new Stage();
+		stage.setScene(scene);
+		stage.setTitle("Coordinates");
+		stage.show();
+
 	 }
 	 
      @FXML protected void handleExtractButtonAction(ActionEvent event) {
@@ -417,7 +416,7 @@ public class FXMLControls{
 							boolean success = true;
 							while (currentMarker < parentObject.markerLabels.size() && success){
 								if (parentObject.mSet.set.get(currentMarker).trackOn){
-									success = parentObject.digitiseMarker(parentObject.refinedCoordinates,currentMarker);
+									success = parentObject.digitiseMarker(parentObject.mSet.set.get(currentMarker).dp.lastKnown,currentMarker);
 								}
 								++currentMarker;
 							}

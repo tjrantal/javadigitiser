@@ -23,6 +23,7 @@ package timo.home.tracking;
 import java.util.Vector;
 public class DigitisedPoints{
 	public Vector<Point> points = null;	
+	public double[] lastKnown = null;
 	public DigitisedPoints(){
 		points = new Vector<Point>();
 	}
