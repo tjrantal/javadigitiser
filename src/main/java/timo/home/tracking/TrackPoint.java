@@ -15,7 +15,7 @@ import timo.home.jcodec.BIWithMeta;
 public class TrackPoint{
 	private static final int SEARCH_DEFAULT_RADIUS = 20;
 	private BIWithMeta currentFrame;
-	private int colourTolerance = 10;
+	private int colourTolerance = 30;
 	private double[] digitisedCoordinates; // = new double[2];
 	private int searchRadius = SEARCH_DEFAULT_RADIUS;
 	private ArrayList<PointHelper> neighbourhood;

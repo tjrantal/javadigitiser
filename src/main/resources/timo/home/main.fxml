@@ -31,9 +31,9 @@
 		</Button>
 	
 	
-	<Label fx:id="colourLabel" text="Colour tolerance 10"  GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="4" GridPane.rowSpan="1" GridPane.vgrow="always"/>
+	<Label fx:id="colourLabel" text="Colour tolerance 30"  GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="4" GridPane.rowSpan="1" GridPane.vgrow="always"/>
 	<Slider
-		fx:id="colourSlider" value="10" min="0" max="200" orientation="HORIZONTAL" GridPane.vgrow="always"
+		fx:id="colourSlider" value="30" min="0" max="200" orientation="HORIZONTAL" GridPane.vgrow="always"
 			showTickLabels="TRUE" showTickMarks="TRUE" blockIncrement="1" majorTickUnit="10" minorTickCount="1"
 		 GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="5" GridPane.rowSpan="1">
 	</Slider>
