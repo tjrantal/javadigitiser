@@ -138,6 +138,7 @@ public class FXMLControls{
 						binarisedFrame = new BIWithMeta(currentFrame);
 						binarisedFrame = binarisedFrame.binarise(binariseThreshold,erodeReps);	//returns B/W image
 						videoView.setImage(SwingFXUtils.toFXImage(binarisedFrame, null));
+						colouredFrame = new BIWithMeta(binarisedFrame);
 						
 				}
 		});
@@ -152,6 +153,7 @@ public class FXMLControls{
 							binarisedFrame = new BIWithMeta(currentFrame);
 							binarisedFrame = binarisedFrame.binarise(binariseThreshold,erodeReps);	//returns B/W image
 							videoView.setImage(SwingFXUtils.toFXImage(binarisedFrame, null));
+							colouredFrame = new BIWithMeta(binarisedFrame);
 						}
 				}
 		});
@@ -278,13 +280,15 @@ public class FXMLControls{
         }catch (Exception ex){
             System.err.println("Could not read frame.");
         }
-		colouredFrame = new BIWithMeta(currentFrame);
+		
 		if (binarise){
 			binarisedFrame = new BIWithMeta(currentFrame);
 			binarisedFrame = binarisedFrame.binarise(binariseThreshold,erodeReps);	//returns B/W image
 			videoView.setImage(SwingFXUtils.toFXImage(binarisedFrame, null));
+			colouredFrame = new BIWithMeta(binarisedFrame);
 		}else{
 			videoView.setImage(SwingFXUtils.toFXImage(currentFrame, null));
+			colouredFrame = new BIWithMeta(currentFrame);
 		}	
 			//Add DigitisedPoints for digitisation
 			//dp = new DigitisedPoints();
@@ -310,8 +314,11 @@ public class FXMLControls{
 						int markerIndex = markerLabels.indexOf(markerBox.getValue());
 						
 						mSet.set.get(markerIndex).tp.setSearchRadius(searchRadius);	//Set radius search radius
-						mSet.set.get(markerIndex).tp.setColourToLookFor(currentFrame,digitisedCoordinates);	//Set radius search radius
-						
+						if (binarise){
+							mSet.set.get(markerIndex).tp.setColourToLookFor(binarisedFrame,digitisedCoordinates);	//Set radius search radius
+						}else{
+							mSet.set.get(markerIndex).tp.setColourToLookFor(currentFrame,digitisedCoordinates);	//Set radius search radius
+						}
 						mSet.set.get(markerIndex).dp.lastKnown = new double[]{digitisedCoordinates[0],digitisedCoordinates[1]};
 						//Set the colour to lookg for
 						//tp.setSearchRadius(searchRadius);	//Set radius search radius
@@ -351,7 +358,6 @@ public class FXMLControls{
 				
 				//Highlight the digitised pixels, add the colouring of the digitised marker	
 				colouredFrame = colourMask(colouredFrame,mSet.set.get(markerIndex).tp.getColourCoordinates(),new int[]{255,0,0});
-				
 				videoView.setImage(SwingFXUtils.toFXImage(colouredFrame, null));	//Update the view
 				return true;
 			}else{
@@ -547,6 +553,7 @@ public class FXMLControls{
 			videoView.setImage(SwingFXUtils.toFXImage(binarisedFrame, null));
 			colouredFrame = new BIWithMeta(binarisedFrame);
         }else{
+			colouredFrame = new BIWithMeta(currentFrame);
 			videoView.setImage(SwingFXUtils.toFXImage(currentFrame, null));
 		}
 	 }
@@ -583,6 +590,7 @@ public class FXMLControls{
 				colouredFrame = new BIWithMeta(binarisedFrame);
 			}else{
 				videoView.setImage(SwingFXUtils.toFXImage(currentFrame, null));
+				colouredFrame = new BIWithMeta(currentFrame);
 			}
 	 	}
 	 }
