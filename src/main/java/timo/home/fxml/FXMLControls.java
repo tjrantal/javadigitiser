@@ -79,7 +79,7 @@ public class FXMLControls{
 	//JCodec videoreader
 	private VideoReader videoReader = null;
 	private BIWithMeta currentFrame;
-	private BIWithMeta binarisedFrame;
+	private BIWithMeta binarisedFrame = null;
 	private BIWithMeta colouredFrame;
 	
 	//For UI
@@ -164,6 +164,17 @@ public class FXMLControls{
 	//Implement binarisation options
 	@FXML protected void handleBinariseToggle(ActionEvent event){
 		binarise = binariseToggle.isSelected();
+		
+		if (binarise){
+			binarisedFrame = new BIWithMeta(currentFrame);
+			binarisedFrame = binarisedFrame.binarise(binariseThreshold,erodeReps);	//returns B/W image
+			videoView.setImage(SwingFXUtils.toFXImage(binarisedFrame, null));
+			colouredFrame = new BIWithMeta(binarisedFrame);
+		}else{
+			videoView.setImage(SwingFXUtils.toFXImage(currentFrame, null));
+			colouredFrame = new BIWithMeta(currentFrame);
+		}
+		
 	}
 	
 	//Implement to read a marker file for marker labels
