@@ -67,9 +67,19 @@ public class FXMLControls{
 	
 	@FXML ComboBox markerBox;
 	@FXML ToggleButton trackToggle;
+	
+	//Binarisation
+	@FXML ToggleButton binariseToggle;
+	private boolean binarise = false;
+	@FXML Slider thresholdSlider;
+	public int binariseThreshold;
+	@FXML Slider erodeSlider;
+	public int erodeReps = 0;
+	
 	//JCodec videoreader
 	private VideoReader videoReader = null;
 	private BIWithMeta currentFrame;
+	private BIWithMeta binarisedFrame;
 	private BIWithMeta colouredFrame;
 	
 	//For UI
@@ -118,8 +128,42 @@ public class FXMLControls{
 				}
 		});
 
+		//Attach Slider listener for binarisation threshold
+		thresholdSlider.valueProperty().addListener(new ChangeListener<Number>() {
+			public void changed(ObservableValue<? extends Number> ov,
+				 Number old_val, Number new_val) {
+				 		//Update tolerance in real time
+				 		binariseThreshold = new_val.intValue();
+						//Re-draw image
+						binarisedFrame = new BIWithMeta(currentFrame);
+						binarisedFrame = binarisedFrame.binarise(binariseThreshold,erodeReps);	//returns B/W image
+						videoView.setImage(SwingFXUtils.toFXImage(binarisedFrame, null));
+						
+				}
+		});
+		
+		erodeSlider.valueProperty().addListener(new ChangeListener<Number>() {
+			public void changed(ObservableValue<? extends Number> ov,
+				 Number old_val, Number new_val) {
+				 		//Update tolerance in real time
+				 		erodeReps = new_val.intValue();
+						if (binarise){
+							//Re-draw image
+							binarisedFrame = new BIWithMeta(currentFrame);
+							binarisedFrame = binarisedFrame.binarise(binariseThreshold,erodeReps);	//returns B/W image
+							videoView.setImage(SwingFXUtils.toFXImage(binarisedFrame, null));
+						}
+				}
+		});
+		
+		
     }
     
+	//Implement binarisation options
+	@FXML protected void handleBinariseToggle(ActionEvent event){
+		binarise = binariseToggle.isSelected();
+	}
+	
 	//Implement to read a marker file for marker labels
 	@FXML protected void handleMarkerButtonAction(ActionEvent event){
 		//Read a file in here
@@ -235,8 +279,13 @@ public class FXMLControls{
             System.err.println("Could not read frame.");
         }
 		colouredFrame = new BIWithMeta(currentFrame);
-        videoView.setImage(SwingFXUtils.toFXImage(currentFrame, null));
-			
+		if (binarise){
+			binarisedFrame = new BIWithMeta(currentFrame);
+			binarisedFrame = binarisedFrame.binarise(binariseThreshold,erodeReps);	//returns B/W image
+			videoView.setImage(SwingFXUtils.toFXImage(binarisedFrame, null));
+		}else{
+			videoView.setImage(SwingFXUtils.toFXImage(currentFrame, null));
+		}	
 			//Add DigitisedPoints for digitisation
 			//dp = new DigitisedPoints();
 			
@@ -287,7 +336,12 @@ public class FXMLControls{
     private boolean digitiseMarker(double[] digitisedCoordinates, int markerIndex){
     	if (digitisedCoordinates != null){
 			
-			mSet.set.get(markerIndex).dp.lastKnown  = mSet.set.get(markerIndex).tp.searchMarker(currentFrame,digitisedCoordinates, mSet.set.get(markerIndex).tp.getTolerance());
+			if (binarise){
+				mSet.set.get(markerIndex).dp.lastKnown  = mSet.set.get(markerIndex).tp.searchMarker(binarisedFrame,digitisedCoordinates, mSet.set.get(markerIndex).tp.getTolerance());
+			}else{
+				mSet.set.get(markerIndex).dp.lastKnown  = mSet.set.get(markerIndex).tp.searchMarker(currentFrame,digitisedCoordinates, mSet.set.get(markerIndex).tp.getTolerance());
+				
+			}
 			if (mSet.set.get(markerIndex).dp.lastKnown  != null){
 				//System.out.println(String.format("Frame %d tStamp %.2f Refined X %.1f Y %.1f",currentFrameNo,currentFrame.getTimeStamp(),refinedCoordinates[0],refinedCoordinates[1]));
 				System.out.println(String.format("%d\t%s\t%f\t%f\t%f",currentFrameNo,markerLabels.get(markerIndex),currentFrame.getTimeStamp(),mSet.set.get(markerIndex).dp.lastKnown[0],mSet.set.get(markerIndex).dp.lastKnown[1]));
@@ -487,8 +541,14 @@ public class FXMLControls{
         }catch (Exception ex){
             System.err.println("Could not read frame.");
         }
-        videoView.setImage(SwingFXUtils.toFXImage(currentFrame, null));
-		colouredFrame = new BIWithMeta(currentFrame);
+		if (binarise){
+			binarisedFrame = new BIWithMeta(currentFrame);
+			binarisedFrame = binarisedFrame.binarise(binariseThreshold,erodeReps);	//returns B/W image
+			videoView.setImage(SwingFXUtils.toFXImage(binarisedFrame, null));
+			colouredFrame = new BIWithMeta(binarisedFrame);
+        }else{
+			videoView.setImage(SwingFXUtils.toFXImage(currentFrame, null));
+		}
 	 }
 	 
 	 public void getFrame(int frameNo){
@@ -505,19 +565,25 @@ public class FXMLControls{
 	 		//Have to search for the frame
 	 		currentFrameNo = frameNo;
 	 		frameSlider.setValue(currentFrameNo);
-			  //Update the VideoView
-			  currentFrame = null;
-			  try{
-			  		long beforeMillis = System.currentTimeMillis();
-					currentFrame = videoReader.readFrame(frameNo);
-				
-					long afterMillis = System.currentTimeMillis();
-					//System.out.println(String.format("got frame, time stamp %.2f took %.2f s to decpde",currentFrame.getTimeStamp(),((double) (afterMillis-beforeMillis))/1000d));
-			  }catch (Exception ex){
-					System.err.println("Could not read frame.");
-			  }
-			  videoView.setImage(SwingFXUtils.toFXImage(currentFrame, null));
-			  colouredFrame = new BIWithMeta(currentFrame);
+			//Update the VideoView
+			currentFrame = null;
+			try{
+				long beforeMillis = System.currentTimeMillis();
+				currentFrame = videoReader.readFrame(frameNo);
+
+				long afterMillis = System.currentTimeMillis();
+				//System.out.println(String.format("got frame, time stamp %.2f took %.2f s to decpde",currentFrame.getTimeStamp(),((double) (afterMillis-beforeMillis))/1000d));
+			}catch (Exception ex){
+				System.err.println("Could not read frame.");
+			}
+			if (binarise){
+				binarisedFrame = new BIWithMeta(currentFrame);
+				binarisedFrame = binarisedFrame.binarise(binariseThreshold,erodeReps);	//returns B/W image
+				videoView.setImage(SwingFXUtils.toFXImage(binarisedFrame, null));
+				colouredFrame = new BIWithMeta(binarisedFrame);
+			}else{
+				videoView.setImage(SwingFXUtils.toFXImage(currentFrame, null));
+			}
 	 	}
 	 }
 	 

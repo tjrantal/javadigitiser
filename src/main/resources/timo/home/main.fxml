@@ -15,9 +15,13 @@
 	<padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
 	 <!--rotate="-90"-->
 	 
-	 	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="0" GridPane.vgrow="always"
+	 	<Button GridPane.columnIndex="0" GridPane.columnSpan="1" GridPane.rowIndex="0" GridPane.vgrow="always"
 		text="Load Video" onAction="#handleLoadButtonAction">
 	</Button>
+	<!--Binarise or not-->
+	<ToggleButton fx:id="binariseToggle" GridPane.columnIndex="1" GridPane.columnSpan="1" GridPane.rowIndex="0" GridPane.vgrow="always"
+		 text="Binarise" onAction="#handleBinariseToggle"> 
+	</ToggleButton>
 	 
 	 <Label fx:id="frameLabel" text="Frame No "  GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="1" GridPane.rowSpan="1" GridPane.vgrow="always"/>
 	<Slider
@@ -26,10 +30,22 @@
 		 GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="2" GridPane.rowSpan="1">
 	</Slider>
 
-	<Button GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.vgrow="always"
+	<Button GridPane.columnIndex="0" GridPane.columnSpan="1" GridPane.rowIndex="3" GridPane.vgrow="always"
 			text="Next Frame" onAction="#handleFrameButtonAction">
 		</Button>
+		
 	
+	
+	<Slider
+		fx:id="thresholdSlider" value="0" min="0" max="255" orientation="HORIZONTAL" GridPane.vgrow="always"
+			showTickLabels="TRUE" showTickMarks="TRUE" blockIncrement="1" majorTickUnit="8" minorTickCount="1"
+		 GridPane.columnIndex="1" GridPane.columnSpan="1" GridPane.rowIndex="3" GridPane.rowSpan="1">
+	</Slider>
+	<Slider
+		fx:id="erodeSlider" value="0" min="0" max="10" orientation="HORIZONTAL" GridPane.vgrow="always"
+			showTickLabels="TRUE" showTickMarks="TRUE" blockIncrement="1" majorTickUnit="1" minorTickCount="1"
+		 GridPane.columnIndex="2" GridPane.columnSpan="1" GridPane.rowIndex="3" GridPane.rowSpan="1">
+	</Slider>
 	
 	<Label fx:id="colourLabel" text="Colour tolerance 30"  GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="4" GridPane.rowSpan="1" GridPane.vgrow="always"/>
 	<Slider
