@@ -15,7 +15,7 @@ javafx {
 
 
 sourceCompatibility = 14
-version = '1.0'
+version = '1.0.1'
 mainClassName = 'timo.home.Digitiser'
 
 configurations.all {
