@@ -23,7 +23,7 @@ configurations.all {
 }
 
 dependencies {
-	compile group: 'org.jcodec', name: 'jcodec', version: '0.2.5'	
+	implementation group: 'org.jcodec', name: 'jcodec', version: '0.2.5'	
 }
 
 jlink {

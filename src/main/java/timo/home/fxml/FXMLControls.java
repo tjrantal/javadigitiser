@@ -331,10 +331,22 @@ public class FXMLControls{
 							mSet.set.get(markerIndex).tp.setColourToLookFor(currentFrame,digitisedCoordinates);	//Set radius search radius
 						}
 						mSet.set.get(markerIndex).dp.lastKnown = new double[]{digitisedCoordinates[0],digitisedCoordinates[1]};
+						
+						//Set marker to autotrack
+						mSet.set.get(markerLabels.indexOf(markerBox.getValue())).trackOn = true;	//Toggle tracking on
+						trackToggle.setSelected(mSet.set.get(markerLabels.indexOf(markerBox.getValue())).trackOn);
+						
 						//Set the colour to lookg for
 						//tp.setSearchRadius(searchRadius);	//Set radius search radius
 						//tp.setColourToLookFor(currentFrame,digitisedCoordinates);	//Update colour to search for						
 						digitiseMarker(digitisedCoordinates,markerIndex);
+						
+						//Advance selected marker
+						if (markerIndex < mSet.set.size()-1){
+							markerBox.setValue(mSet.set.get(markerIndex+1).label);
+						}
+					
+						
 						
 						//System.out.println(String.format("Digitised X %.1f Y %.1f scaledX %.1f scaledY %.1f"
 						//,e.getX(),e.getY()
