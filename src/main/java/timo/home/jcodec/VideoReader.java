@@ -38,6 +38,9 @@ public class VideoReader{
 	double fps;
 	int width;
 	int height;
+	
+	//To enable extending
+	public VideoReader(){}
 
 	public VideoReader(String fileIn){
 		this(new File(fileIn));

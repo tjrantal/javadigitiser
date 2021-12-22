@@ -40,6 +40,7 @@ import java.util.Locale;
 import javax.imageio.ImageIO;
 
 import timo.home.jcodec.VideoReader;
+import timo.home.jcodec.RawVideoReader;
 import timo.home.jcodec.BIWithMeta;
 //import timo.home.tracking.TrackPoint;
 //import timo.home.tracking.DigitisedPoints;
@@ -227,14 +228,18 @@ public class FXMLControls{
         
         //Browse for a file
         FileChooser fc = new FileChooser();
-		 fc.setTitle("Select MP4 videofile");
+		 fc.setTitle("Select MP4|MOV|RAW videofile");
 		 fc.getExtensionFilters().addAll(
-				   new ExtensionFilter("Video files", Arrays.asList(new String[]{"*.mp4","*.MP4","*.MOV","*.mov"})));
+				   new ExtensionFilter("Video files", Arrays.asList(new String[]{"*.mp4","*.MP4","*.MOV","*.mov","*.RAW","*.raw"})));
 		 File selectedFile = fc.showOpenDialog(frameLabel.getScene().getWindow());
 		 
 		 if (selectedFile != null) {
 			 currentFile = selectedFile;
-			 videoReader = new VideoReader(selectedFile);
+			 if (selectedFile.toString().contains(".raw") || selectedFile.toString().contains(".RAW")){
+				 videoReader = new RawVideoReader(selectedFile);
+			 }else{
+				videoReader = new VideoReader(selectedFile);
+			 }
 			double duration = videoReader.getDuration();
 			int	frames = videoReader.getTotalFrames();
 			double fps = videoReader.getFPS();
